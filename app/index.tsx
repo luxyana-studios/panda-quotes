@@ -1,6 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Text, View, Pressable, StyleSheet } from "react-native";
 import { Image } from "expo-image";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  withDelay,
+  withSequence
+} from "react-native-reanimated";
 
 const RED_PANDA_QUOTES = [
   "Bamboo may bend, but wisdom remains rooted in the earth.",
@@ -56,15 +63,89 @@ export default function Index() {
   const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0);
   const [showIntention, setShowIntention] = useState(true);
 
+  const quoteOpacity = useSharedValue(0);
+  const authorOpacity = useSharedValue(0);
+  const intentionText1Opacity = useSharedValue(0);
+  const intentionText2Opacity = useSharedValue(0);
+  const intentionButtonOpacity = useSharedValue(0);
+  const quoteButtonOpacity = useSharedValue(0);
+
+  const quoteAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: quoteOpacity.value,
+    };
+  });
+
+  const authorAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: authorOpacity.value,
+    };
+  });
+
+  const intentionText1AnimatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: intentionText1Opacity.value,
+    };
+  });
+
+  const intentionText2AnimatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: intentionText2Opacity.value,
+    };
+  });
+
+  const intentionButtonAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: intentionButtonOpacity.value,
+    };
+  });
+
+  const quoteButtonAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: quoteButtonOpacity.value,
+    };
+  });
+
   const handleReady = () => {
     setShowIntention(false);
+
+    // Start animations when quote appears
+    quoteOpacity.value = 0;
+    authorOpacity.value = 0;
+    quoteButtonOpacity.value = 0;
+
+    quoteOpacity.value = withTiming(1, { duration: 1500 });
+    authorOpacity.value = withDelay(1500, withTiming(1, { duration: 1000 }));
+    quoteButtonOpacity.value = withDelay(2500, withTiming(1, { duration: 800 }));
   };
 
   const shuffleQuote = () => {
     const nextIndex = (currentQuoteIndex + 1) % RED_PANDA_QUOTES.length;
     setCurrentQuoteIndex(nextIndex);
     setShowIntention(true);
+
+    // Start intention screen animations
+    intentionText1Opacity.value = 0;
+    intentionText2Opacity.value = 0;
+    intentionButtonOpacity.value = 0;
+
+    intentionText1Opacity.value = withTiming(1, { duration: 1500 });
+    intentionText2Opacity.value = withDelay(1500, withTiming(1, { duration: 1000 }));
+    intentionButtonOpacity.value = withDelay(2500, withTiming(1, { duration: 800 }));
   };
+
+  // Trigger intention animations on mount
+  useEffect(() => {
+    if (showIntention) {
+      intentionText1Opacity.value = 0;
+      intentionText2Opacity.value = 0;
+      intentionButtonOpacity.value = 0;
+
+      intentionText1Opacity.value = withTiming(1, { duration: 1500 });
+      intentionText2Opacity.value = withDelay(1500, withTiming(1, { duration: 1000 }));
+      intentionButtonOpacity.value = withDelay(2500, withTiming(1, { duration: 800 }));
+    }
+  }, [showIntention]);
 
   if (showIntention) {
     return (
@@ -76,13 +157,19 @@ export default function Index() {
         />
 
         <View style={styles.intentionContainer}>
-          <Text style={styles.intentionText}>Take a breath.</Text>
-          <Text style={styles.intentionText}>Think of a question or situation.</Text>
+          <Animated.Text style={[styles.intentionText, intentionText1AnimatedStyle]}>
+            Take a breath.
+          </Animated.Text>
+          <Animated.Text style={[styles.intentionText, intentionText2AnimatedStyle]}>
+            Think of a question or situation.
+          </Animated.Text>
         </View>
 
-        <Pressable style={styles.primaryButton} onPress={handleReady}>
-          <Text style={styles.primaryButtonText}>I'm ready</Text>
-        </Pressable>
+        <Animated.View style={intentionButtonAnimatedStyle}>
+          <Pressable style={styles.primaryButton} onPress={handleReady}>
+            <Text style={styles.primaryButtonText}>I'm ready</Text>
+          </Pressable>
+        </Animated.View>
       </View>
     );
   }
@@ -98,13 +185,19 @@ export default function Index() {
       <Text style={styles.contextLabel}>For this moment:</Text>
 
       <View style={styles.quoteContainer}>
-        <Text style={styles.quoteText}>{RED_PANDA_QUOTES[currentQuoteIndex]}</Text>
-        <Text style={styles.author}>— Red Panda Philosopher</Text>
+        <Animated.Text style={[styles.quoteText, quoteAnimatedStyle]}>
+          {RED_PANDA_QUOTES[currentQuoteIndex]}
+        </Animated.Text>
+        <Animated.Text style={[styles.author, authorAnimatedStyle]}>
+          — Red Panda Philosopher
+        </Animated.Text>
       </View>
 
-      <Pressable style={styles.shuffleButton} onPress={shuffleQuote}>
-        <Text style={styles.shuffleButtonText}>Draw wisdom</Text>
-      </Pressable>
+      <Animated.View style={quoteButtonAnimatedStyle}>
+        <Pressable style={styles.shuffleButton} onPress={shuffleQuote}>
+          <Text style={styles.shuffleButtonText}>Draw wisdom</Text>
+        </Pressable>
+      </Animated.View>
     </View>
   );
 }
