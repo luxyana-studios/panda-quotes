@@ -1,0 +1,95 @@
+import { StyleSheet } from "react-native";
+
+export const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#FFF5F0",
+    padding: 20,
+    gap: 20,
+  },
+  pandaImage: {
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    borderWidth: 3,
+    borderColor: "#C85A3F",
+  },
+  quoteContainer: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    padding: 30,
+    marginBottom: 40,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+    maxWidth: 400,
+  },
+  quoteText: {
+    fontSize: 24,
+    lineHeight: 36,
+    color: "#2D2D2D",
+    textAlign: "center",
+    fontStyle: "italic",
+    marginBottom: 16,
+  },
+  author: {
+    fontSize: 16,
+    color: "#666666",
+    textAlign: "right",
+  },
+  buttonContainer: {
+    gap: 12,
+    alignItems: "center",
+  },
+  secondaryButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+  },
+  secondaryButtonText: {
+    color: "#666666",
+    fontSize: 16,
+    textAlign: "center",
+  },
+  completionContainer: {
+    gap: 20,
+    alignItems: "center",
+  },
+  closingMessage: {
+    fontSize: 16,
+    color: "#666666",
+    fontStyle: "italic",
+    textAlign: "center",
+  },
+  intentionContainer: {
+    paddingHorizontal: 40,
+    gap: 12,
+  },
+  intentionText: {
+    fontSize: 20,
+    lineHeight: 32,
+    color: "#2D2D2D",
+    textAlign: "center",
+  },
+  primaryButton: {
+    backgroundColor: "#C85A3F",
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    borderRadius: 24,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+    minWidth: 200,
+    alignItems: "center",
+  },
+  primaryButtonText: {
+    color: "#FFFFFF",
+    fontSize: 18,
+    fontWeight: "600",
+  },
+});
