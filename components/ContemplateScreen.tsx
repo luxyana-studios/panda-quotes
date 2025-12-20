@@ -1,28 +1,32 @@
+import { useState, useEffect } from "react";
 import { Text, View, Pressable } from "react-native";
 import { Image } from "expo-image";
 import Animated, {
   useAnimatedStyle,
-  SharedValue,
+  useSharedValue,
+  withTiming,
 } from "react-native-reanimated";
 import { styles } from "@/app/index.styles";
 
+const ANIMATION_TIMINGS = {
+  buttonFadeIn: 800,
+  completionDelay: 8000,
+};
+
 interface ContemplateScreenProps {
   currentQuote: string;
-  quoteOpacity: SharedValue<number>;
-  authorOpacity: SharedValue<number>;
-  moveOnButtonOpacity: SharedValue<number>;
-  showMoveOnButton: boolean;
   onMoveOn: () => void;
 }
 
 export function ContemplateScreen({
   currentQuote,
-  quoteOpacity,
-  authorOpacity,
-  moveOnButtonOpacity,
-  showMoveOnButton,
   onMoveOn,
 }: ContemplateScreenProps) {
+  const [showMoveOnButton, setShowMoveOnButton] = useState(false);
+  const quoteOpacity = useSharedValue(1);
+  const authorOpacity = useSharedValue(1);
+  const moveOnButtonOpacity = useSharedValue(0);
+
   const quoteAnimatedStyle = useAnimatedStyle(() => ({
     opacity: quoteOpacity.value,
   }));
@@ -34,6 +38,15 @@ export function ContemplateScreen({
   const moveOnButtonAnimatedStyle = useAnimatedStyle(() => ({
     opacity: moveOnButtonOpacity.value,
   }));
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowMoveOnButton(true);
+      moveOnButtonOpacity.value = withTiming(1, { duration: ANIMATION_TIMINGS.buttonFadeIn });
+    }, ANIMATION_TIMINGS.completionDelay);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <View style={styles.container}>

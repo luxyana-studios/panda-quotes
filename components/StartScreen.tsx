@@ -1,24 +1,29 @@
+import { useEffect } from "react";
 import { Text, View, Pressable } from "react-native";
 import { Image } from "expo-image";
 import Animated, {
   useAnimatedStyle,
-  SharedValue,
+  useSharedValue,
+  withTiming,
+  withDelay,
 } from "react-native-reanimated";
 import { styles } from "@/app/index.styles";
 
+const ANIMATION_TIMINGS = {
+  textFadeIn: 1500,
+  textDelay: 1500,
+  buttonFadeIn: 800,
+};
+
 interface StartScreenProps {
-  intentionText1Opacity: SharedValue<number>;
-  intentionText2Opacity: SharedValue<number>;
-  intentionButtonOpacity: SharedValue<number>;
   onReady: () => void;
 }
 
-export function StartScreen({
-  intentionText1Opacity,
-  intentionText2Opacity,
-  intentionButtonOpacity,
-  onReady,
-}: StartScreenProps) {
+export function StartScreen({ onReady }: StartScreenProps) {
+  const intentionText1Opacity = useSharedValue(0);
+  const intentionText2Opacity = useSharedValue(0);
+  const intentionButtonOpacity = useSharedValue(0);
+
   const intentionText1AnimatedStyle = useAnimatedStyle(() => ({
     opacity: intentionText1Opacity.value,
   }));
@@ -30,6 +35,18 @@ export function StartScreen({
   const intentionButtonAnimatedStyle = useAnimatedStyle(() => ({
     opacity: intentionButtonOpacity.value,
   }));
+
+  useEffect(() => {
+    intentionText1Opacity.value = withTiming(1, { duration: ANIMATION_TIMINGS.textFadeIn });
+    intentionText2Opacity.value = withDelay(
+      ANIMATION_TIMINGS.textDelay,
+      withTiming(1, { duration: 1000 })
+    );
+    intentionButtonOpacity.value = withDelay(
+      2500,
+      withTiming(1, { duration: ANIMATION_TIMINGS.buttonFadeIn })
+    );
+  }, []);
 
   return (
     <View style={styles.container}>

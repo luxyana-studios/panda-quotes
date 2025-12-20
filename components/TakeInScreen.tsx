@@ -1,28 +1,35 @@
+import { useEffect } from "react";
 import { Text, View, Pressable } from "react-native";
 import { Image } from "expo-image";
 import Animated, {
   useAnimatedStyle,
-  SharedValue,
+  useSharedValue,
+  withTiming,
+  withDelay,
 } from "react-native-reanimated";
 import { styles } from "@/app/index.styles";
 
+const ANIMATION_TIMINGS = {
+  textFadeIn: 1500,
+  textDelay: 1500,
+  buttonFadeIn: 800,
+};
+
 interface TakeInScreenProps {
   currentQuote: string;
-  quoteOpacity: SharedValue<number>;
-  authorOpacity: SharedValue<number>;
-  quoteButtonOpacity: SharedValue<number>;
   onSitWithThis: () => void;
   onDrawWisdom: () => void;
 }
 
 export function TakeInScreen({
   currentQuote,
-  quoteOpacity,
-  authorOpacity,
-  quoteButtonOpacity,
   onSitWithThis,
   onDrawWisdom,
 }: TakeInScreenProps) {
+  const quoteOpacity = useSharedValue(0);
+  const authorOpacity = useSharedValue(0);
+  const quoteButtonOpacity = useSharedValue(0);
+
   const quoteAnimatedStyle = useAnimatedStyle(() => ({
     opacity: quoteOpacity.value,
   }));
@@ -34,6 +41,18 @@ export function TakeInScreen({
   const quoteButtonAnimatedStyle = useAnimatedStyle(() => ({
     opacity: quoteButtonOpacity.value,
   }));
+
+  useEffect(() => {
+    quoteOpacity.value = withTiming(1, { duration: ANIMATION_TIMINGS.textFadeIn });
+    authorOpacity.value = withDelay(
+      ANIMATION_TIMINGS.textDelay,
+      withTiming(1, { duration: 1000 })
+    );
+    quoteButtonOpacity.value = withDelay(
+      2500,
+      withTiming(1, { duration: ANIMATION_TIMINGS.buttonFadeIn })
+    );
+  }, []);
 
   return (
     <View style={styles.container}>
