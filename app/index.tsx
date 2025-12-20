@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Text, View, Pressable, StyleSheet } from "react-native";
+import { Image } from "expo-image";
 
 const RED_PANDA_QUOTES = [
   "Bamboo may bend, but wisdom remains rooted in the earth.",
@@ -61,13 +62,21 @@ export default function Index() {
 
   return (
     <View style={styles.container}>
+      <Image
+        source={require("@/assets/modi.jpeg")}
+        style={styles.pandaImage}
+        contentFit="contain"
+      />
+
+      <Text style={styles.contextLabel}>For this moment:</Text>
+
       <View style={styles.quoteContainer}>
         <Text style={styles.quoteText}>{RED_PANDA_QUOTES[currentQuoteIndex]}</Text>
         <Text style={styles.author}>— Red Panda Philosopher</Text>
       </View>
 
       <Pressable style={styles.shuffleButton} onPress={shuffleQuote}>
-        <Text style={styles.shuffleButtonText}>Shuffle</Text>
+        <Text style={styles.shuffleButtonText}>Draw wisdom</Text>
       </Pressable>
     </View>
   );
@@ -80,6 +89,20 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#FFF5F0",
     padding: 20,
+    gap: 20,
+  },
+  pandaImage: {
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    borderWidth: 3,
+    borderColor: "#C85A3F",
+  },
+  contextLabel: {
+    fontSize: 16,
+    color: "#666666",
+    marginBottom: 12,
+    fontStyle: "italic",
   },
   quoteContainer: {
     backgroundColor: "#FFFFFF",
