@@ -5,10 +5,13 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withTiming,
+  withDelay,
 } from "react-native-reanimated";
 import { styles } from "@/app/index.styles";
 
 const ANIMATION_TIMINGS = {
+  textFadeIn: 1500,
+  textDelay: 1500,
   buttonFadeIn: 800,
   completionDelay: 8000,
 };
@@ -23,9 +26,14 @@ export function ContemplateScreen({
   onMoveOn,
 }: ContemplateScreenProps) {
   const [showMoveOnButton, setShowMoveOnButton] = useState(false);
-  const quoteOpacity = useSharedValue(1);
-  const authorOpacity = useSharedValue(1);
+  const closingMessageOpacity = useSharedValue(0);
+  const quoteOpacity = useSharedValue(0);
+  const authorOpacity = useSharedValue(0);
   const moveOnButtonOpacity = useSharedValue(0);
+
+  const closingMessageAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: closingMessageOpacity.value,
+  }));
 
   const quoteAnimatedStyle = useAnimatedStyle(() => ({
     opacity: quoteOpacity.value,
@@ -40,6 +48,18 @@ export function ContemplateScreen({
   }));
 
   useEffect(() => {
+    // Animate closing message and quote
+    closingMessageOpacity.value = withTiming(1, { duration: ANIMATION_TIMINGS.textFadeIn });
+    quoteOpacity.value = withDelay(
+      ANIMATION_TIMINGS.textDelay,
+      withTiming(1, { duration: ANIMATION_TIMINGS.textFadeIn })
+    );
+    authorOpacity.value = withDelay(
+      ANIMATION_TIMINGS.textDelay * 2,
+      withTiming(1, { duration: 1000 })
+    );
+
+    // Show move on button after delay
     const timer = setTimeout(() => {
       setShowMoveOnButton(true);
       moveOnButtonOpacity.value = withTiming(1, { duration: ANIMATION_TIMINGS.buttonFadeIn });
@@ -56,7 +76,9 @@ export function ContemplateScreen({
         contentFit="contain"
       />
 
-      <Text style={styles.closingMessage}>Carry this thought with you.</Text>
+      <Animated.Text style={[styles.closingMessage, closingMessageAnimatedStyle]}>
+        Carry this thought with you.
+      </Animated.Text>
 
       <View style={styles.quoteContainer}>
         <Animated.Text style={[styles.quoteText, quoteAnimatedStyle]}>
