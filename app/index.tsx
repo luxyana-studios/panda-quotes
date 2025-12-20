@@ -54,11 +54,38 @@ const RED_PANDA_QUOTES = [
 
 export default function Index() {
   const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0);
+  const [showIntention, setShowIntention] = useState(true);
+
+  const handleReady = () => {
+    setShowIntention(false);
+  };
 
   const shuffleQuote = () => {
     const nextIndex = (currentQuoteIndex + 1) % RED_PANDA_QUOTES.length;
     setCurrentQuoteIndex(nextIndex);
+    setShowIntention(true);
   };
+
+  if (showIntention) {
+    return (
+      <View style={styles.container}>
+        <Image
+          source={require("@/assets/modi.jpeg")}
+          style={styles.pandaImage}
+          contentFit="contain"
+        />
+
+        <View style={styles.intentionContainer}>
+          <Text style={styles.intentionText}>Take a breath.</Text>
+          <Text style={styles.intentionText}>Think of a question or situation.</Text>
+        </View>
+
+        <Pressable style={styles.primaryButton} onPress={handleReady}>
+          <Text style={styles.primaryButtonText}>I'm ready</Text>
+        </Pressable>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -141,6 +168,34 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   shuffleButtonText: {
+    color: "#FFFFFF",
+    fontSize: 18,
+    fontWeight: "600",
+  },
+  intentionContainer: {
+    paddingHorizontal: 40,
+    gap: 12,
+  },
+  intentionText: {
+    fontSize: 20,
+    lineHeight: 32,
+    color: "#2D2D2D",
+    textAlign: "center",
+  },
+  primaryButton: {
+    backgroundColor: "#C85A3F",
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    borderRadius: 24,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+    minWidth: 200,
+    alignItems: "center",
+  },
+  primaryButtonText: {
     color: "#FFFFFF",
     fontSize: 18,
     fontWeight: "600",
