@@ -76,7 +76,7 @@ export function ContemplateScreen({
         contentFit="contain"
       />
 
-      <Animated.Text style={[styles.closingMessage, closingMessageAnimatedStyle]}>
+      <Animated.Text style={[styles.intentionText, closingMessageAnimatedStyle]}>
         Carry this thought with you.
       </Animated.Text>
 

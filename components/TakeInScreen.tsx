@@ -77,7 +77,7 @@ export function TakeInScreen({
             <Text style={styles.primaryButtonText}>I'll sit with this</Text>
           </Pressable>
           <Pressable style={styles.secondaryButton} onPress={onDrawWisdom}>
-            <Text style={styles.secondaryButtonText}>Draw wisdom</Text>
+            <Text style={styles.secondaryButtonText}>Ask another question</Text>
           </Pressable>
         </View>
       </Animated.View>

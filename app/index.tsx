@@ -4,9 +4,6 @@ import { TakeInScreen } from "@/components/TakeInScreen";
 import { ContemplateScreen } from "@/components/ContemplateScreen";
 import { useQuoteManager } from "@/hooks/useQuoteManager";
 
-// ============================================
-// TYPES
-// ============================================
 type Screen = 'start' | 'takeIn' | 'contemplate';
 
 export default function Index() {
