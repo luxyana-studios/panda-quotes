@@ -62,6 +62,7 @@ const RED_PANDA_QUOTES = [
 export default function Index() {
   const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0);
   const [showIntention, setShowIntention] = useState(true);
+  const [isCompleted, setIsCompleted] = useState(false);
 
   const quoteOpacity = useSharedValue(0);
   const authorOpacity = useSharedValue(0);
@@ -108,6 +109,7 @@ export default function Index() {
 
   const handleReady = () => {
     setShowIntention(false);
+    setIsCompleted(false);
 
     // Start animations when quote appears
     quoteOpacity.value = 0;
@@ -119,10 +121,15 @@ export default function Index() {
     quoteButtonOpacity.value = withDelay(2500, withTiming(1, { duration: 800 }));
   };
 
+  const handleSitWithThis = () => {
+    setIsCompleted(true);
+  };
+
   const shuffleQuote = () => {
     const nextIndex = (currentQuoteIndex + 1) % RED_PANDA_QUOTES.length;
     setCurrentQuoteIndex(nextIndex);
     setShowIntention(true);
+    setIsCompleted(false);
 
     // Start intention screen animations
     intentionText1Opacity.value = 0;
@@ -182,8 +189,6 @@ export default function Index() {
         contentFit="contain"
       />
 
-      <Text style={styles.contextLabel}>For this moment:</Text>
-
       <View style={styles.quoteContainer}>
         <Animated.Text style={[styles.quoteText, quoteAnimatedStyle]}>
           {RED_PANDA_QUOTES[currentQuoteIndex]}
@@ -193,11 +198,20 @@ export default function Index() {
         </Animated.Text>
       </View>
 
-      <Animated.View style={quoteButtonAnimatedStyle}>
-        <Pressable style={styles.shuffleButton} onPress={shuffleQuote}>
-          <Text style={styles.shuffleButtonText}>Draw wisdom</Text>
-        </Pressable>
-      </Animated.View>
+      {!isCompleted ? (
+        <Animated.View style={quoteButtonAnimatedStyle}>
+          <View style={styles.buttonContainer}>
+            <Pressable style={styles.primaryButton} onPress={handleSitWithThis}>
+              <Text style={styles.primaryButtonText}>I'll sit with this</Text>
+            </Pressable>
+            <Pressable style={styles.secondaryButton} onPress={shuffleQuote}>
+              <Text style={styles.secondaryButtonText}>Draw wisdom</Text>
+            </Pressable>
+          </View>
+        </Animated.View>
+      ) : (
+        <Text style={styles.closingMessage}>Carry this thought with you.</Text>
+      )}
     </View>
   );
 }
@@ -217,12 +231,6 @@ const styles = StyleSheet.create({
     borderRadius: 75,
     borderWidth: 3,
     borderColor: "#C85A3F",
-  },
-  contextLabel: {
-    fontSize: 16,
-    color: "#666666",
-    marginBottom: 12,
-    fontStyle: "italic",
   },
   quoteContainer: {
     backgroundColor: "#FFFFFF",
@@ -249,21 +257,24 @@ const styles = StyleSheet.create({
     color: "#666666",
     textAlign: "right",
   },
-  shuffleButton: {
-    backgroundColor: "#C85A3F",
-    paddingVertical: 16,
-    paddingHorizontal: 32,
-    borderRadius: 24,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
+  buttonContainer: {
+    gap: 12,
+    alignItems: "center",
   },
-  shuffleButtonText: {
-    color: "#FFFFFF",
-    fontSize: 18,
-    fontWeight: "600",
+  secondaryButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+  },
+  secondaryButtonText: {
+    color: "#666666",
+    fontSize: 16,
+    textAlign: "center",
+  },
+  closingMessage: {
+    fontSize: 16,
+    color: "#666666",
+    fontStyle: "italic",
+    textAlign: "center",
   },
   intentionContainer: {
     paddingHorizontal: 40,
