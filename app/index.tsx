@@ -6,7 +6,20 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
   withDelay,
+  SharedValue,
 } from "react-native-reanimated";
+
+// ============================================
+// TYPES & CONSTANTS
+// ============================================
+type Screen = 'start' | 'takeIn' | 'contemplate';
+
+const ANIMATION_TIMINGS = {
+  textFadeIn: 1500,
+  textDelay: 1500,
+  buttonFadeIn: 800,
+  completionDelay: 8000,
+};
 
 const RED_PANDA_QUOTES = [
   "Bamboo may bend, but wisdom remains rooted in the earth.",
@@ -58,12 +71,187 @@ const RED_PANDA_QUOTES = [
   "The wise know that every expert was once a beginner who fell out of many trees.",
 ];
 
+// ============================================
+// SCREEN COMPONENTS
+// ============================================
+
+interface StartScreenProps {
+  intentionText1Opacity: SharedValue<number>;
+  intentionText2Opacity: SharedValue<number>;
+  intentionButtonOpacity: SharedValue<number>;
+  onReady: () => void;
+}
+
+function StartScreen({
+  intentionText1Opacity,
+  intentionText2Opacity,
+  intentionButtonOpacity,
+  onReady,
+}: StartScreenProps) {
+  const intentionText1AnimatedStyle = useAnimatedStyle(() => ({
+    opacity: intentionText1Opacity.value,
+  }));
+
+  const intentionText2AnimatedStyle = useAnimatedStyle(() => ({
+    opacity: intentionText2Opacity.value,
+  }));
+
+  const intentionButtonAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: intentionButtonOpacity.value,
+  }));
+
+  return (
+    <View style={styles.container}>
+      <Image
+        source={require("@/assets/modi.jpeg")}
+        style={styles.pandaImage}
+        contentFit="contain"
+      />
+
+      <View style={styles.intentionContainer}>
+        <Animated.Text style={[styles.intentionText, intentionText1AnimatedStyle]}>
+          Take a breath.
+        </Animated.Text>
+        <Animated.Text style={[styles.intentionText, intentionText2AnimatedStyle]}>
+          Think of a question or situation.
+        </Animated.Text>
+      </View>
+
+      <Animated.View style={intentionButtonAnimatedStyle}>
+        <Pressable style={styles.primaryButton} onPress={onReady}>
+          <Text style={styles.primaryButtonText}>I'm ready</Text>
+        </Pressable>
+      </Animated.View>
+    </View>
+  );
+}
+
+interface TakeInScreenProps {
+  currentQuote: string;
+  quoteOpacity: SharedValue<number>;
+  authorOpacity: SharedValue<number>;
+  quoteButtonOpacity: SharedValue<number>;
+  onSitWithThis: () => void;
+  onDrawWisdom: () => void;
+}
+
+function TakeInScreen({
+  currentQuote,
+  quoteOpacity,
+  authorOpacity,
+  quoteButtonOpacity,
+  onSitWithThis,
+  onDrawWisdom,
+}: TakeInScreenProps) {
+  const quoteAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: quoteOpacity.value,
+  }));
+
+  const authorAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: authorOpacity.value,
+  }));
+
+  const quoteButtonAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: quoteButtonOpacity.value,
+  }));
+
+  return (
+    <View style={styles.container}>
+      <Image
+        source={require("@/assets/modi.jpeg")}
+        style={styles.pandaImage}
+        contentFit="contain"
+      />
+
+      <View style={styles.quoteContainer}>
+        <Animated.Text style={[styles.quoteText, quoteAnimatedStyle]}>
+          {currentQuote}
+        </Animated.Text>
+        <Animated.Text style={[styles.author, authorAnimatedStyle]}>
+          — Red Panda Philosopher
+        </Animated.Text>
+      </View>
+
+      <Animated.View style={quoteButtonAnimatedStyle}>
+        <View style={styles.buttonContainer}>
+          <Pressable style={styles.primaryButton} onPress={onSitWithThis}>
+            <Text style={styles.primaryButtonText}>I'll sit with this</Text>
+          </Pressable>
+          <Pressable style={styles.secondaryButton} onPress={onDrawWisdom}>
+            <Text style={styles.secondaryButtonText}>Draw wisdom</Text>
+          </Pressable>
+        </View>
+      </Animated.View>
+    </View>
+  );
+}
+
+interface ContemplateScreenProps {
+  currentQuote: string;
+  quoteOpacity: SharedValue<number>;
+  authorOpacity: SharedValue<number>;
+  moveOnButtonOpacity: SharedValue<number>;
+  showMoveOnButton: boolean;
+  onMoveOn: () => void;
+}
+
+function ContemplateScreen({
+  currentQuote,
+  quoteOpacity,
+  authorOpacity,
+  moveOnButtonOpacity,
+  showMoveOnButton,
+  onMoveOn,
+}: ContemplateScreenProps) {
+  const quoteAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: quoteOpacity.value,
+  }));
+
+  const authorAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: authorOpacity.value,
+  }));
+
+  const moveOnButtonAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: moveOnButtonOpacity.value,
+  }));
+
+  return (
+    <View style={styles.container}>
+      <Image
+        source={require("@/assets/modi.jpeg")}
+        style={styles.pandaImage}
+        contentFit="contain"
+      />
+
+      <Text style={styles.closingMessage}>Carry this thought with you.</Text>
+
+      <View style={styles.quoteContainer}>
+        <Animated.Text style={[styles.quoteText, quoteAnimatedStyle]}>
+          {currentQuote}
+        </Animated.Text>
+        <Animated.Text style={[styles.author, authorAnimatedStyle]}>
+          — Red Panda Philosopher
+        </Animated.Text>
+      </View>
+
+      <Animated.View style={moveOnButtonAnimatedStyle}>
+        <Pressable
+          style={styles.primaryButton}
+          onPress={onMoveOn}
+          disabled={!showMoveOnButton}
+        >
+          <Text style={styles.primaryButtonText}>I'm ready to move on now</Text>
+        </Pressable>
+      </Animated.View>
+    </View>
+  );
+}
+
 export default function Index() {
+  const [currentScreen, setCurrentScreen] = useState<Screen>('start');
   const [currentQuoteIndex, setCurrentQuoteIndex] = useState(() =>
     Math.floor(Math.random() * RED_PANDA_QUOTES.length)
   );
-  const [showIntention, setShowIntention] = useState(true);
-  const [isCompleted, setIsCompleted] = useState(false);
   const [showCloseButton, setShowCloseButton] = useState(false);
   const [usedIndices, setUsedIndices] = useState<number[]>([]);
 
@@ -75,77 +263,33 @@ export default function Index() {
   const quoteButtonOpacity = useSharedValue(0);
   const moveOnButtonOpacity = useSharedValue(0);
 
-  const quoteAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      opacity: quoteOpacity.value,
-    };
-  });
-
-  const authorAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      opacity: authorOpacity.value,
-    };
-  });
-
-  const intentionText1AnimatedStyle = useAnimatedStyle(() => {
-    return {
-      opacity: intentionText1Opacity.value,
-    };
-  });
-
-  const intentionText2AnimatedStyle = useAnimatedStyle(() => {
-    return {
-      opacity: intentionText2Opacity.value,
-    };
-  });
-
-  const intentionButtonAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      opacity: intentionButtonOpacity.value,
-    };
-  });
-
-  const quoteButtonAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      opacity: quoteButtonOpacity.value,
-    };
-  });
-
-  const moveOnButtonAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      opacity: moveOnButtonOpacity.value,
-    };
-  });
-
   const handleReady = () => {
-    setShowIntention(false);
-    setIsCompleted(false);
+    setCurrentScreen('takeIn');
 
     // Start animations when quote appears
     quoteOpacity.value = 0;
     authorOpacity.value = 0;
     quoteButtonOpacity.value = 0;
 
-    quoteOpacity.value = withTiming(1, { duration: 1500 });
-    authorOpacity.value = withDelay(1500, withTiming(1, { duration: 1000 }));
-    quoteButtonOpacity.value = withDelay(2500, withTiming(1, { duration: 800 }));
+    quoteOpacity.value = withTiming(1, { duration: ANIMATION_TIMINGS.textFadeIn });
+    authorOpacity.value = withDelay(ANIMATION_TIMINGS.textDelay, withTiming(1, { duration: 1000 }));
+    quoteButtonOpacity.value = withDelay(2500, withTiming(1, { duration: ANIMATION_TIMINGS.buttonFadeIn }));
   };
 
   const handleSitWithThis = () => {
-    setIsCompleted(true);
+    setCurrentScreen('contemplate');
     setShowCloseButton(false);
 
-    // Show move on button after ~10 seconds
+    // Show move on button after delay
     moveOnButtonOpacity.value = 0;
     setTimeout(() => {
       setShowCloseButton(true);
-      moveOnButtonOpacity.value = withTiming(1, { duration: 800 });
-    }, 8000);
+      moveOnButtonOpacity.value = withTiming(1, { duration: ANIMATION_TIMINGS.buttonFadeIn });
+    }, ANIMATION_TIMINGS.completionDelay);
   };
 
   const handleClose = () => {
-    setShowIntention(true);
-    setIsCompleted(false);
+    setCurrentScreen('start');
     setShowCloseButton(false);
   };
 
@@ -175,104 +319,64 @@ export default function Index() {
 
     setCurrentQuoteIndex(nextIndex);
     setUsedIndices([...usedIndices, nextIndex]);
-    setShowIntention(true);
-    setIsCompleted(false);
+    setCurrentScreen('start');
 
     // Start intention screen animations
     intentionText1Opacity.value = 0;
     intentionText2Opacity.value = 0;
     intentionButtonOpacity.value = 0;
 
-    intentionText1Opacity.value = withTiming(1, { duration: 1500 });
-    intentionText2Opacity.value = withDelay(1500, withTiming(1, { duration: 1000 }));
-    intentionButtonOpacity.value = withDelay(2500, withTiming(1, { duration: 800 }));
+    intentionText1Opacity.value = withTiming(1, { duration: ANIMATION_TIMINGS.textFadeIn });
+    intentionText2Opacity.value = withDelay(ANIMATION_TIMINGS.textDelay, withTiming(1, { duration: 1000 }));
+    intentionButtonOpacity.value = withDelay(2500, withTiming(1, { duration: ANIMATION_TIMINGS.buttonFadeIn }));
   };
 
   // Trigger intention animations on mount
   useEffect(() => {
-    if (showIntention) {
+    if (currentScreen === 'start') {
       intentionText1Opacity.value = 0;
       intentionText2Opacity.value = 0;
       intentionButtonOpacity.value = 0;
 
-      intentionText1Opacity.value = withTiming(1, { duration: 1500 });
-      intentionText2Opacity.value = withDelay(1500, withTiming(1, { duration: 1000 }));
-      intentionButtonOpacity.value = withDelay(2500, withTiming(1, { duration: 800 }));
+      intentionText1Opacity.value = withTiming(1, { duration: ANIMATION_TIMINGS.textFadeIn });
+      intentionText2Opacity.value = withDelay(ANIMATION_TIMINGS.textDelay, withTiming(1, { duration: 1000 }));
+      intentionButtonOpacity.value = withDelay(2500, withTiming(1, { duration: ANIMATION_TIMINGS.buttonFadeIn }));
     }
-  }, [showIntention]);
+  }, [currentScreen]);
 
-  if (showIntention) {
-    return (
-      <View style={styles.container}>
-        <Image
-          source={require("@/assets/modi.jpeg")}
-          style={styles.pandaImage}
-          contentFit="contain"
+  switch (currentScreen) {
+    case 'start':
+      return (
+        <StartScreen
+          intentionText1Opacity={intentionText1Opacity}
+          intentionText2Opacity={intentionText2Opacity}
+          intentionButtonOpacity={intentionButtonOpacity}
+          onReady={handleReady}
         />
-
-        <View style={styles.intentionContainer}>
-          <Animated.Text style={[styles.intentionText, intentionText1AnimatedStyle]}>
-            Take a breath.
-          </Animated.Text>
-          <Animated.Text style={[styles.intentionText, intentionText2AnimatedStyle]}>
-            Think of a question or situation.
-          </Animated.Text>
-        </View>
-
-        <Animated.View style={intentionButtonAnimatedStyle}>
-          <Pressable style={styles.primaryButton} onPress={handleReady}>
-            <Text style={styles.primaryButtonText}>I'm ready</Text>
-          </Pressable>
-        </Animated.View>
-      </View>
-    );
+      );
+    case 'takeIn':
+      return (
+        <TakeInScreen
+          currentQuote={RED_PANDA_QUOTES[currentQuoteIndex]}
+          quoteOpacity={quoteOpacity}
+          authorOpacity={authorOpacity}
+          quoteButtonOpacity={quoteButtonOpacity}
+          onSitWithThis={handleSitWithThis}
+          onDrawWisdom={shuffleQuote}
+        />
+      );
+    case 'contemplate':
+      return (
+        <ContemplateScreen
+          currentQuote={RED_PANDA_QUOTES[currentQuoteIndex]}
+          quoteOpacity={quoteOpacity}
+          authorOpacity={authorOpacity}
+          moveOnButtonOpacity={moveOnButtonOpacity}
+          showMoveOnButton={showCloseButton}
+          onMoveOn={handleClose}
+        />
+      );
   }
-
-  return (
-    <View style={styles.container}>
-      <Image
-        source={require("@/assets/modi.jpeg")}
-        style={styles.pandaImage}
-        contentFit="contain"
-      />
-
-      {isCompleted && (
-        <Text style={styles.closingMessage}>Carry this thought with you.</Text>
-      )}
-
-      <View style={styles.quoteContainer}>
-        <Animated.Text style={[styles.quoteText, quoteAnimatedStyle]}>
-          {RED_PANDA_QUOTES[currentQuoteIndex]}
-        </Animated.Text>
-        <Animated.Text style={[styles.author, authorAnimatedStyle]}>
-          — Red Panda Philosopher
-        </Animated.Text>
-      </View>
-
-      {!isCompleted ? (
-        <Animated.View style={quoteButtonAnimatedStyle}>
-          <View style={styles.buttonContainer}>
-            <Pressable style={styles.primaryButton} onPress={handleSitWithThis}>
-              <Text style={styles.primaryButtonText}>I'll sit with this</Text>
-            </Pressable>
-            <Pressable style={styles.secondaryButton} onPress={shuffleQuote}>
-              <Text style={styles.secondaryButtonText}>Draw wisdom</Text>
-            </Pressable>
-          </View>
-        </Animated.View>
-      ) : (
-        <Animated.View style={moveOnButtonAnimatedStyle}>
-          <Pressable
-            style={styles.primaryButton}
-            onPress={handleClose}
-            disabled={!showCloseButton}
-          >
-            <Text style={styles.primaryButtonText}>I'm ready to move on now</Text>
-          </Pressable>
-        </Animated.View>
-      )}
-    </View>
-  );
 }
 
 const styles = StyleSheet.create({
