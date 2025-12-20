@@ -6,7 +6,6 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
   withDelay,
-  withSequence
 } from "react-native-reanimated";
 
 const RED_PANDA_QUOTES = [
@@ -60,9 +59,13 @@ const RED_PANDA_QUOTES = [
 ];
 
 export default function Index() {
-  const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0);
+  const [currentQuoteIndex, setCurrentQuoteIndex] = useState(() =>
+    Math.floor(Math.random() * RED_PANDA_QUOTES.length)
+  );
   const [showIntention, setShowIntention] = useState(true);
   const [isCompleted, setIsCompleted] = useState(false);
+  const [showCloseButton, setShowCloseButton] = useState(false);
+  const [usedIndices, setUsedIndices] = useState<number[]>([]);
 
   const quoteOpacity = useSharedValue(0);
   const authorOpacity = useSharedValue(0);
@@ -70,6 +73,7 @@ export default function Index() {
   const intentionText2Opacity = useSharedValue(0);
   const intentionButtonOpacity = useSharedValue(0);
   const quoteButtonOpacity = useSharedValue(0);
+  const moveOnButtonOpacity = useSharedValue(0);
 
   const quoteAnimatedStyle = useAnimatedStyle(() => {
     return {
@@ -107,6 +111,12 @@ export default function Index() {
     };
   });
 
+  const moveOnButtonAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: moveOnButtonOpacity.value,
+    };
+  });
+
   const handleReady = () => {
     setShowIntention(false);
     setIsCompleted(false);
@@ -123,11 +133,48 @@ export default function Index() {
 
   const handleSitWithThis = () => {
     setIsCompleted(true);
+    setShowCloseButton(false);
+
+    // Show move on button after ~10 seconds
+    moveOnButtonOpacity.value = 0;
+    setTimeout(() => {
+      setShowCloseButton(true);
+      moveOnButtonOpacity.value = withTiming(1, { duration: 800 });
+    }, 8000);
+  };
+
+  const handleClose = () => {
+    setShowIntention(true);
+    setIsCompleted(false);
+    setShowCloseButton(false);
   };
 
   const shuffleQuote = () => {
-    const nextIndex = (currentQuoteIndex + 1) % RED_PANDA_QUOTES.length;
+    // Get available indices (not yet used)
+    let availableIndices = [];
+    for (let i = 0; i < RED_PANDA_QUOTES.length; i++) {
+      if (!usedIndices.includes(i) && i !== currentQuoteIndex) {
+        availableIndices.push(i);
+      }
+    }
+
+    // If all quotes have been used, reset
+    if (availableIndices.length === 0) {
+      availableIndices = [];
+      for (let i = 0; i < RED_PANDA_QUOTES.length; i++) {
+        if (i !== currentQuoteIndex) {
+          availableIndices.push(i);
+        }
+      }
+      setUsedIndices([]);
+    }
+
+    // Pick random index from available
+    const randomIndex = Math.floor(Math.random() * availableIndices.length);
+    const nextIndex = availableIndices[randomIndex];
+
     setCurrentQuoteIndex(nextIndex);
+    setUsedIndices([...usedIndices, nextIndex]);
     setShowIntention(true);
     setIsCompleted(false);
 
@@ -189,6 +236,10 @@ export default function Index() {
         contentFit="contain"
       />
 
+      {isCompleted && (
+        <Text style={styles.closingMessage}>Carry this thought with you.</Text>
+      )}
+
       <View style={styles.quoteContainer}>
         <Animated.Text style={[styles.quoteText, quoteAnimatedStyle]}>
           {RED_PANDA_QUOTES[currentQuoteIndex]}
@@ -210,7 +261,15 @@ export default function Index() {
           </View>
         </Animated.View>
       ) : (
-        <Text style={styles.closingMessage}>Carry this thought with you.</Text>
+        <Animated.View style={moveOnButtonAnimatedStyle}>
+          <Pressable
+            style={styles.primaryButton}
+            onPress={handleClose}
+            disabled={!showCloseButton}
+          >
+            <Text style={styles.primaryButtonText}>I'm ready to move on now</Text>
+          </Pressable>
+        </Animated.View>
       )}
     </View>
   );
@@ -269,6 +328,10 @@ const styles = StyleSheet.create({
     color: "#666666",
     fontSize: 16,
     textAlign: "center",
+  },
+  completionContainer: {
+    gap: 20,
+    alignItems: "center",
   },
   closingMessage: {
     fontSize: 16,

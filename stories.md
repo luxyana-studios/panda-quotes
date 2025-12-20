@@ -81,3 +81,29 @@ Acceptance Criteria
 Non-Goals
 • No journaling
 • No sharing
+
+5. Return after selecting I'll sit with this:
+
+Behavior
+
+When the user taps “I’ll sit with this”: 1. Fade out the button 2. Keep the quote visible 3. After ~1 second, show a small, unobtrusive affordance at the bottom:
+• Back to home
+• or Close
+
+This keeps:
+• Ritual closure ✔
+• User control ✔
+• No harsh “exit app” behavior ✔
+
+Why this works
+• Divination rituals end gently
+• The user decides when to leave
+• No sudden context loss
+
+UI suggestion
+
+Bottom-center, small text button (not primary):
+
+Close
+
+No icon. No emphasis.
