@@ -19,6 +19,7 @@ export default function Index() {
   };
 
   const handleClose = () => {
+    getNextQuote();
     setCurrentScreen('start');
   };
 
