@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Text, View, Pressable } from "react-native";
 import { Image } from "expo-image";
 import Animated, {
@@ -7,7 +7,7 @@ import Animated, {
   withTiming,
   withDelay,
 } from "react-native-reanimated";
-import { styles } from "@/app/index.styles";
+import { styles } from "@/styles/index.styles";
 
 const ANIMATION_TIMINGS = {
   textFadeIn: 1500,
@@ -20,6 +20,7 @@ interface StartScreenProps {
 }
 
 export function StartScreen({ onReady }: StartScreenProps) {
+  const [buttonEnabled, setButtonEnabled] = useState(false);
   const intentionText1Opacity = useSharedValue(0);
   const intentionText2Opacity = useSharedValue(0);
   const intentionButtonOpacity = useSharedValue(0);
@@ -46,6 +47,13 @@ export function StartScreen({ onReady }: StartScreenProps) {
       2500,
       withTiming(1, { duration: ANIMATION_TIMINGS.buttonFadeIn })
     );
+
+    // Enable button after fade-in completes
+    const timer = setTimeout(() => {
+      setButtonEnabled(true);
+    }, 2500 + ANIMATION_TIMINGS.buttonFadeIn);
+
+    return () => clearTimeout(timer);
   }, []);
 
   return (
@@ -66,7 +74,7 @@ export function StartScreen({ onReady }: StartScreenProps) {
       </View>
 
       <Animated.View style={intentionButtonAnimatedStyle}>
-        <Pressable style={styles.primaryButton} onPress={onReady}>
+        <Pressable style={styles.primaryButton} onPress={onReady} disabled={!buttonEnabled}>
           <Text style={styles.primaryButtonText}>I'm ready</Text>
         </Pressable>
       </Animated.View>

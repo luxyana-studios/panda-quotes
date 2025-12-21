@@ -7,7 +7,7 @@ import Animated, {
   withTiming,
   withDelay,
 } from "react-native-reanimated";
-import { styles } from "@/app/index.styles";
+import { styles } from "@/styles/index.styles";
 
 const ANIMATION_TIMINGS = {
   textFadeIn: 1500,
