@@ -1,13 +1,13 @@
-import { useState, useEffect } from "react";
-import { Text, View, Pressable } from "react-native";
-import { Image } from "expo-image";
+import { useState, useEffect } from 'react';
+import { Text, View, Pressable } from 'react-native';
+import { Image } from 'expo-image';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withTiming,
   withDelay,
-} from "react-native-reanimated";
-import { styles } from "@/styles/index.styles";
+} from 'react-native-reanimated';
+import { styles } from '@/styles/index.styles';
 
 const ANIMATION_TIMINGS = {
   textFadeIn: 1500,
@@ -45,11 +45,14 @@ export function ContemplateScreen({
 
   const moveOnButtonAnimatedStyle = useAnimatedStyle(() => ({
     opacity: moveOnButtonOpacity.value,
+    transform: [{ scale: moveOnButtonOpacity.value }],
   }));
 
   useEffect(() => {
     // Animate closing message and quote
-    closingMessageOpacity.value = withTiming(1, { duration: ANIMATION_TIMINGS.textFadeIn });
+    closingMessageOpacity.value = withTiming(1, {
+      duration: ANIMATION_TIMINGS.textFadeIn,
+    });
     quoteOpacity.value = withDelay(
       ANIMATION_TIMINGS.textDelay,
       withTiming(1, { duration: ANIMATION_TIMINGS.textFadeIn })
@@ -62,7 +65,9 @@ export function ContemplateScreen({
     // Show move on button after delay
     const timer = setTimeout(() => {
       setShowMoveOnButton(true);
-      moveOnButtonOpacity.value = withTiming(1, { duration: ANIMATION_TIMINGS.buttonFadeIn });
+      moveOnButtonOpacity.value = withTiming(1, {
+        duration: ANIMATION_TIMINGS.buttonFadeIn,
+      });
     }, ANIMATION_TIMINGS.completionDelay);
 
     return () => clearTimeout(timer);
@@ -71,12 +76,14 @@ export function ContemplateScreen({
   return (
     <View style={styles.container}>
       <Image
-        source={require("@/assets/modi.jpeg")}
+        source={require('@/assets/modi.jpeg')}
         style={styles.pandaImage}
         contentFit="contain"
       />
 
-      <Animated.Text style={[styles.intentionText, closingMessageAnimatedStyle]}>
+      <Animated.Text
+        style={[styles.intentionText, closingMessageAnimatedStyle]}
+      >
         Carry this thought with you.
       </Animated.Text>
 
@@ -89,15 +96,21 @@ export function ContemplateScreen({
         </Animated.Text>
       </View>
 
-      <Animated.View style={moveOnButtonAnimatedStyle}>
-        <Pressable
-          style={styles.primaryButton}
-          onPress={onMoveOn}
-          disabled={!showMoveOnButton}
-        >
-          <Text style={styles.primaryButtonText}>I'm ready to move on now</Text>
-        </Pressable>
-      </Animated.View>
+      <View style={{ minHeight: 60, justifyContent: 'center' }}>
+        {showMoveOnButton && (
+          <Animated.View style={moveOnButtonAnimatedStyle}>
+            <Pressable
+              style={styles.primaryButton}
+              onPress={onMoveOn}
+              disabled={!showMoveOnButton}
+            >
+              <Text style={styles.primaryButtonText}>
+                I'm ready to move on now
+              </Text>
+            </Pressable>
+          </Animated.View>
+        )}
+      </View>
     </View>
   );
 }
