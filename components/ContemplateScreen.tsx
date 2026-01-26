@@ -77,6 +77,7 @@ export function ContemplateScreen({
       }, 6000);
     }, 100);
     return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -112,7 +113,7 @@ export function ContemplateScreen({
               disabled={!showMoveOnButton}
             >
               <Text style={styles.primaryButtonText}>
-                {"I'm ready to move on now"}
+                I&apos;m ready to move on now
               </Text>
             </Pressable>
           </Animated.View>

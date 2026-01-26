@@ -69,6 +69,7 @@ export function TakeInScreen({
       }, 2000);
     }, 100);
     return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -96,7 +97,7 @@ export function TakeInScreen({
           <Animated.View style={buttonStyle}>
             <View style={styles.buttonContainer}>
               <Pressable style={styles.primaryButton} onPress={onSitWithThis}>
-                <Text style={styles.primaryButtonText}>{"I'll sit with this"}</Text>
+                <Text style={styles.primaryButtonText}>I&apos;ll sit with this</Text>
               </Pressable>
               <Pressable style={styles.secondaryButton} onPress={onDrawWisdom}>
                 <Text style={styles.secondaryButtonText}>
