@@ -1,13 +1,13 @@
-import { useState, useEffect } from "react";
-import { Text, View, Pressable } from "react-native";
-import { Image } from "expo-image";
+import { useState, useEffect } from 'react';
+import { Text, View, Pressable } from 'react-native';
+import { Image } from 'expo-image';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withTiming,
   withDelay,
-} from "react-native-reanimated";
-import { styles } from "@/styles/index.styles";
+} from 'react-native-reanimated';
+import { styles } from '@/styles/index.styles';
 
 const ANIMATION_TIMINGS = {
   textFadeIn: 1500,
@@ -20,7 +20,8 @@ interface StartScreenProps {
 }
 
 export function StartScreen({ onReady }: StartScreenProps) {
-  const [buttonEnabled, setButtonEnabled] = useState(false);
+  const [showButton, setShowButton] = useState(false);
+  const buttonEnabled = useSharedValue(false);
   const intentionText1Opacity = useSharedValue(0);
   const intentionText2Opacity = useSharedValue(0);
   const intentionButtonOpacity = useSharedValue(0);
@@ -35,23 +36,26 @@ export function StartScreen({ onReady }: StartScreenProps) {
 
   const intentionButtonAnimatedStyle = useAnimatedStyle(() => ({
     opacity: intentionButtonOpacity.value,
+    transform: [{ scale: intentionButtonOpacity.value }],
   }));
 
   useEffect(() => {
-    intentionText1Opacity.value = withTiming(1, { duration: ANIMATION_TIMINGS.textFadeIn });
+    intentionText1Opacity.value = withTiming(1, {
+      duration: ANIMATION_TIMINGS.textFadeIn,
+    });
     intentionText2Opacity.value = withDelay(
       ANIMATION_TIMINGS.textDelay,
       withTiming(1, { duration: 1000 })
     );
-    intentionButtonOpacity.value = withDelay(
-      2500,
-      withTiming(1, { duration: ANIMATION_TIMINGS.buttonFadeIn })
-    );
 
-    // Enable button after fade-in completes
+    // Show button and start animation after delay
     const timer = setTimeout(() => {
-      setButtonEnabled(true);
-    }, 2500 + ANIMATION_TIMINGS.buttonFadeIn);
+      setShowButton(true);
+      intentionButtonOpacity.value = withTiming(1, {
+        duration: ANIMATION_TIMINGS.buttonFadeIn,
+      });
+      buttonEnabled.value = true;
+    }, 2500);
 
     return () => clearTimeout(timer);
   }, []);
@@ -59,25 +63,33 @@ export function StartScreen({ onReady }: StartScreenProps) {
   return (
     <View style={styles.container}>
       <Image
-        source={require("@/assets/modi.jpeg")}
+        source={require('@/assets/modi.jpeg')}
         style={styles.pandaImage}
         contentFit="contain"
       />
 
       <View style={styles.intentionContainer}>
-        <Animated.Text style={[styles.intentionText, intentionText1AnimatedStyle]}>
+        <Animated.Text
+          style={[styles.intentionText, intentionText1AnimatedStyle]}
+        >
           Take a breath.
         </Animated.Text>
-        <Animated.Text style={[styles.intentionText, intentionText2AnimatedStyle]}>
+        <Animated.Text
+          style={[styles.intentionText, intentionText2AnimatedStyle]}
+        >
           Think of a question or situation.
         </Animated.Text>
       </View>
 
-      <Animated.View style={intentionButtonAnimatedStyle}>
-        <Pressable style={styles.primaryButton} onPress={onReady} disabled={!buttonEnabled}>
-          <Text style={styles.primaryButtonText}>I'm ready</Text>
-        </Pressable>
-      </Animated.View>
+      <View style={{ minHeight: 60, justifyContent: 'center' }}>
+        {showButton && (
+          <Animated.View style={intentionButtonAnimatedStyle}>
+            <Pressable style={styles.primaryButton} onPress={onReady}>
+              <Text style={styles.primaryButtonText}>I'm ready</Text>
+            </Pressable>
+          </Animated.View>
+        )}
+      </View>
     </View>
   );
 }
