@@ -2,12 +2,13 @@ import { useState } from "react";
 import { StartScreen } from "@/components/StartScreen";
 import { TakeInScreen } from "@/components/TakeInScreen";
 import { ContemplateScreen } from "@/components/ContemplateScreen";
+import { OnboardingFlow } from "@/components/onboarding/OnboardingFlow";
 import { useQuoteManager } from "@/hooks/useQuoteManager";
 
-type Screen = 'start' | 'takeIn' | 'contemplate';
+type Screen = 'onboarding' | 'start' | 'takeIn' | 'contemplate';
 
 export default function Index() {
-  const [currentScreen, setCurrentScreen] = useState<Screen>('start');
+  const [currentScreen, setCurrentScreen] = useState<Screen>('onboarding');
   const { currentQuote, getNextQuote } = useQuoteManager();
 
   const handleReady = () => {
@@ -29,6 +30,8 @@ export default function Index() {
   };
 
   switch (currentScreen) {
+    case 'onboarding':
+      return <OnboardingFlow onComplete={() => setCurrentScreen('start')} />;
     case 'start':
       return <StartScreen onReady={handleReady} />;
     case 'takeIn':
