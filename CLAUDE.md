@@ -4,55 +4,64 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Panda Quotes is a React Native application built with Expo (v54) and React 19. The app uses Expo Router for file-based navigation and is configured to run on iOS, Android, and Web platforms.
+Panda Quotes is a mindfulness app that displays philosophical quotes from a "Red Panda Philosopher." Built with Expo (v54) and React 19.
 
 ## Development Commands
 
 ```bash
-# Install dependencies
-npm install
-
-# Start development server
-npm start
-# or
-expo start
-
-# Platform-specific commands
-npm run ios        # Start on iOS simulator
-npm run android    # Start on Android emulator
-npm run web        # Start web version
-
-# Code quality
-npm run lint       # Run ESLint
+npm install          # Install dependencies
+npm start            # Start Expo dev server
+npm run ios          # iOS simulator
+npm run android      # Android emulator
+npm run web          # Web browser
+npm run lint         # ESLint
 ```
 
 ## Architecture
 
-### Routing System
-- Uses Expo Router (v6) with file-based routing
-- Routes are defined in the `app/` directory
-- `app/_layout.tsx` is the root layout using Stack navigation
-- `app/index.tsx` is the main entry point/home screen
-- Typed routes are enabled via `experiments.typedRoutes` in app.json
+### Screen Flow State Machine
+
+The app uses a simple state machine in `app/index.tsx` with three screens:
+
+```
+StartScreen → TakeInScreen → ContemplateScreen
+     ↑              │                │
+     └──────────────┴────────────────┘
+```
+
+- **StartScreen**: Breathing prompt, "I'm ready" button
+- **TakeInScreen**: Shows quote, options to "sit with this" or "ask another question"
+- **ContemplateScreen**: Reflection phase with quote, "move on" returns to start
+
+Screen transitions are managed via `useState<'start' | 'takeIn' | 'contemplate'>`.
+
+### Quote Management
+
+`hooks/useQuoteManager.ts` handles quote cycling:
+- Maintains `usedIndices` to avoid repeats until all quotes are shown
+- Randomizes selection from unused quotes
+- Resets when all quotes have been displayed
+- Quotes stored in `constants/quotes.ts`
+
+### Animation Pattern
+
+All screens use React Native Reanimated with consistent timing:
+- Text elements fade in sequentially using `withDelay` + `withTiming`
+- Buttons appear after text animations complete
+- Timing constants defined at top of each screen component
 
 ### Import Paths
-- Path alias `@/*` configured in tsconfig.json maps to the project root
-- Use `@/components/...`, `@/app/...`, etc. for imports
+
+Use path alias `@/*` which maps to project root:
+- `@/components/...`, `@/hooks/...`, `@/constants/...`, `@/styles/...`
 
 ### Key Configuration
-- **New Architecture**: React Native New Architecture is enabled (`newArchEnabled: true`)
-- **React Compiler**: Experimental React Compiler is enabled
-- **TypeScript**: Strict mode enabled
-- **Scheme**: Deep linking scheme is `pandaquotes://`
-- **Owner**: EAS project owned by `luxyana-studios`
 
-### Platform Support
-- iOS: Supports iPad
-- Android: Edge-to-edge enabled, predictive back gesture disabled
-- Web: Static output configured
+- React Native New Architecture enabled
+- React Compiler experimental enabled
+- TypeScript strict mode
+- Deep linking scheme: `pandaquotes://`
 
-### Notable Dependencies
-- React Navigation v7 (bottom tabs)
-- React Native Reanimated v4
-- React Native Gesture Handler
-- Expo Haptics, Image, Linking, and other Expo modules
+## Git Commits
+
+- NEVER add Co-Authored-By or any AI attribution to commit messages

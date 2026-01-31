@@ -58,6 +58,7 @@ export function StartScreen({ onReady }: StartScreenProps) {
     }, 2500);
 
     return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -85,7 +86,7 @@ export function StartScreen({ onReady }: StartScreenProps) {
         {showButton && (
           <Animated.View style={intentionButtonAnimatedStyle}>
             <Pressable style={styles.primaryButton} onPress={onReady}>
-              <Text style={styles.primaryButtonText}>I'm ready</Text>
+              <Text style={styles.primaryButtonText}>I&apos;m ready</Text>
             </Pressable>
           </Animated.View>
         )}
