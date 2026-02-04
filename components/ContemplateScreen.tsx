@@ -6,106 +6,113 @@ import Animated, {
   useSharedValue,
   withTiming,
   withDelay,
+  Easing,
 } from 'react-native-reanimated';
 import { styles } from '@/styles/index.styles';
-
-const ANIMATION_TIMINGS = {
-  textFadeIn: 1500,
-  textDelay: 1500,
-  buttonFadeIn: 800,
-  completionDelay: 8000,
-};
 
 interface ContemplateScreenProps {
   currentQuote: string;
   onMoveOn: () => void;
 }
 
+const EASE_OUT = Easing.bezier(0.25, 0.46, 0.45, 0.94);
+
 export function ContemplateScreen({
   currentQuote,
   onMoveOn,
 }: ContemplateScreenProps) {
   const [showMoveOnButton, setShowMoveOnButton] = useState(false);
-  const closingMessageOpacity = useSharedValue(0);
+
+  const imageOpacity = useSharedValue(0);
+  const imageScale = useSharedValue(0.9);
+  const closingOpacity = useSharedValue(0);
+  const closingTranslateY = useSharedValue(12);
   const quoteOpacity = useSharedValue(0);
+  const quoteTranslateY = useSharedValue(16);
   const authorOpacity = useSharedValue(0);
-  const moveOnButtonOpacity = useSharedValue(0);
+  const buttonOpacity = useSharedValue(0);
+  const buttonTranslateY = useSharedValue(16);
 
-  const closingMessageAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: closingMessageOpacity.value,
+  const imageStyle = useAnimatedStyle(() => ({
+    opacity: imageOpacity.value,
+    transform: [{ scale: imageScale.value }],
   }));
 
-  const quoteAnimatedStyle = useAnimatedStyle(() => ({
+  const closingStyle = useAnimatedStyle(() => ({
+    opacity: closingOpacity.value,
+    transform: [{ translateY: closingTranslateY.value }],
+  }));
+
+  const quoteStyle = useAnimatedStyle(() => ({
     opacity: quoteOpacity.value,
+    transform: [{ translateY: quoteTranslateY.value }],
   }));
 
-  const authorAnimatedStyle = useAnimatedStyle(() => ({
+  const authorStyle = useAnimatedStyle(() => ({
     opacity: authorOpacity.value,
   }));
 
-  const moveOnButtonAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: moveOnButtonOpacity.value,
-    transform: [{ scale: moveOnButtonOpacity.value }],
+  const buttonStyle = useAnimatedStyle(() => ({
+    opacity: buttonOpacity.value,
+    transform: [{ translateY: buttonTranslateY.value }],
   }));
 
   useEffect(() => {
-    // Animate closing message and quote
-    closingMessageOpacity.value = withTiming(1, {
-      duration: ANIMATION_TIMINGS.textFadeIn,
-    });
-    quoteOpacity.value = withDelay(
-      ANIMATION_TIMINGS.textDelay,
-      withTiming(1, { duration: ANIMATION_TIMINGS.textFadeIn })
-    );
-    authorOpacity.value = withDelay(
-      ANIMATION_TIMINGS.textDelay * 2,
-      withTiming(1, { duration: 1000 })
-    );
-
-    // Show move on button after delay
     const timer = setTimeout(() => {
-      setShowMoveOnButton(true);
-      moveOnButtonOpacity.value = withTiming(1, {
-        duration: ANIMATION_TIMINGS.buttonFadeIn,
-      });
-    }, ANIMATION_TIMINGS.completionDelay);
+      imageOpacity.value = withTiming(1, { duration: 800, easing: EASE_OUT });
+      imageScale.value = withTiming(1, { duration: 800, easing: EASE_OUT });
 
+      closingOpacity.value = withDelay(400, withTiming(1, { duration: 900, easing: EASE_OUT }));
+      closingTranslateY.value = withDelay(400, withTiming(0, { duration: 900, easing: EASE_OUT }));
+
+      quoteOpacity.value = withDelay(1200, withTiming(1, { duration: 1000, easing: EASE_OUT }));
+      quoteTranslateY.value = withDelay(1200, withTiming(0, { duration: 1000, easing: EASE_OUT }));
+
+      authorOpacity.value = withDelay(2000, withTiming(1, { duration: 800, easing: EASE_OUT }));
+
+      setTimeout(() => {
+        setShowMoveOnButton(true);
+        buttonOpacity.value = withTiming(1, { duration: 700, easing: EASE_OUT });
+        buttonTranslateY.value = withTiming(0, { duration: 700, easing: EASE_OUT });
+      }, 6000);
+    }, 100);
     return () => clearTimeout(timer);
   }, []);
 
   return (
     <View style={styles.container}>
-      <Image
-        source={require('@/assets/modi.jpeg')}
-        style={styles.pandaImage}
-        contentFit="contain"
-      />
+      <View style={styles.topDecoration} />
+      <View style={styles.bottomDecoration} />
 
-      <Animated.Text
-        style={[styles.intentionText, closingMessageAnimatedStyle]}
-      >
+      <Animated.View style={[styles.pandaImageWrapper, imageStyle]}>
+        <Image
+          source={require('@/assets/modi.jpeg')}
+          style={styles.pandaImage}
+          contentFit="cover"
+        />
+      </Animated.View>
+
+      <Animated.Text style={[styles.intentionText, closingStyle]}>
         Carry this thought with you.
       </Animated.Text>
 
-      <View style={styles.quoteContainer}>
-        <Animated.Text style={[styles.quoteText, quoteAnimatedStyle]}>
-          {currentQuote}
-        </Animated.Text>
-        <Animated.Text style={[styles.author, authorAnimatedStyle]}>
+      <Animated.View style={[styles.quoteContainer, quoteStyle]}>
+        <Text style={styles.quoteText}>{currentQuote}</Text>
+        <Animated.Text style={[styles.author, authorStyle]}>
           — Red Panda Philosopher
         </Animated.Text>
-      </View>
+      </Animated.View>
 
-      <View style={{ minHeight: 60, justifyContent: 'center' }}>
+      <View style={{ minHeight: 70, justifyContent: 'center' }}>
         {showMoveOnButton && (
-          <Animated.View style={moveOnButtonAnimatedStyle}>
+          <Animated.View style={buttonStyle}>
             <Pressable
               style={styles.primaryButton}
               onPress={onMoveOn}
               disabled={!showMoveOnButton}
             >
               <Text style={styles.primaryButtonText}>
-                I'm ready to move on now
+                {"I'm ready to move on now"}
               </Text>
             </Pressable>
           </Animated.View>

@@ -1,95 +1,144 @@
 import { StyleSheet } from 'react-native';
+import { colors } from '@/constants/colors';
 
 export const styles = StyleSheet.create({
+  // ─── Container ────────────────────────────────────────────
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#6B3E3E',
-    padding: 20,
+    backgroundColor: colors.brandAccent,
+    padding: 24,
     gap: 20,
   },
-  pandaImage: {
-    width: 150,
-    height: 150,
-    borderRadius: 75,
-    borderWidth: 3,
-    borderColor: '#FFF5F0',
+  topDecoration: {
+    position: 'absolute',
+    top: -80,
+    right: -50,
+    width: 220,
+    height: 220,
+    borderRadius: 110,
+    backgroundColor: 'rgba(255,255,255,0.08)',
   },
-  quoteContainer: {
-    backgroundColor: '#FFF5F0',
-    borderRadius: 16,
-    padding: 30,
-    marginBottom: 40,
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 2 },
+  bottomDecoration: {
+    position: 'absolute',
+    bottom: -100,
+    left: -70,
+    width: 260,
+    height: 260,
+    borderRadius: 130,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+  },
+
+  // ─── Panda Image ──────────────────────────────────────────
+  pandaImageWrapper: {
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    overflow: 'hidden',
+    borderWidth: 4,
+    borderColor: 'rgba(255,255,255,0.5)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 4,
-    maxWidth: 400,
+    shadowRadius: 16,
+    elevation: 6,
+  },
+  pandaImage: {
+    width: '100%',
+    height: '100%',
+  },
+
+  // ─── Quote Card ───────────────────────────────────────────
+  quoteContainer: {
+    backgroundColor: colors.brandLight,
+    borderRadius: 24,
+    padding: 28,
+    marginVertical: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 5,
+    maxWidth: 360,
+    width: '100%',
   },
   quoteText: {
-    fontSize: 24,
-    lineHeight: 36,
-    color: '#2D2D2D',
+    fontSize: 22,
+    lineHeight: 34,
+    color: colors.brandDark,
     textAlign: 'center',
     fontStyle: 'italic',
     marginBottom: 16,
+    letterSpacing: 0.2,
   },
   author: {
-    fontSize: 16,
-    color: '#6B3E3E',
+    fontSize: 14,
+    color: colors.brandPrimary,
     textAlign: 'right',
+    fontWeight: '500',
   },
+
+  // ─── Intention Text ───────────────────────────────────────
+  intentionContainer: {
+    paddingHorizontal: 32,
+    gap: 14,
+  },
+  intentionText: {
+    fontSize: 21,
+    lineHeight: 32,
+    color: '#ffffff',
+    textAlign: 'center',
+    fontWeight: '500',
+    letterSpacing: 0.3,
+  },
+
+  // ─── Buttons ──────────────────────────────────────────────
   buttonContainer: {
-    gap: 12,
+    gap: 14,
     alignItems: 'center',
+  },
+  primaryButton: {
+    backgroundColor: '#ffffff',
+    paddingVertical: 17,
+    paddingHorizontal: 36,
+    borderRadius: 30,
+    shadowColor: 'rgba(0,0,0,0.25)',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 10,
+    elevation: 4,
+    minWidth: 220,
+    alignItems: 'center',
+  },
+  primaryButtonText: {
+    color: colors.brandDark,
+    fontSize: 17,
+    fontWeight: '700',
+    letterSpacing: 0.3,
   },
   secondaryButton: {
     paddingVertical: 12,
     paddingHorizontal: 24,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.15)',
   },
   secondaryButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
+    color: 'rgba(255,255,255,0.9)',
+    fontSize: 15,
+    fontWeight: '500',
     textAlign: 'center',
   },
+
+  // ─── Completion / Closing ─────────────────────────────────
   completionContainer: {
     gap: 20,
     alignItems: 'center',
   },
   closingMessage: {
-    fontSize: 16,
-    color: '#FFFFFF',
+    fontSize: 17,
+    color: 'rgba(255,255,255,0.85)',
     fontStyle: 'italic',
     textAlign: 'center',
-  },
-  intentionContainer: {
-    paddingHorizontal: 40,
-    gap: 12,
-  },
-  intentionText: {
-    fontSize: 20,
-    lineHeight: 32,
-    color: '#FFFFFF',
-    textAlign: 'center',
-  },
-  primaryButton: {
-    backgroundColor: '#FFF5F0',
-    paddingVertical: 16,
-    paddingHorizontal: 32,
-    borderRadius: 24,
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
-    minWidth: 200,
-    alignItems: 'center',
-  },
-  primaryButtonText: {
-    color: '#6B3E3E',
-    fontSize: 18,
-    fontWeight: '600',
   },
 });
