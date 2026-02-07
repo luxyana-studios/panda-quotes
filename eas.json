@@ -16,6 +16,12 @@
     }
   },
   "submit": {
-    "production": {}
+    "production": {
+      "ios": {
+        "appleId": "alvaro.troya@outlook.com",
+        "ascAppId": "6758789066",
+        "appleTeamId": "9ZN4MZF8YM"
+      }
+    }
   }
 }
