@@ -12,7 +12,10 @@
       "distribution": "internal"
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "android": {
+        "buildType": "app-bundle"
+      }
     }
   },
   "submit": {
@@ -21,6 +24,10 @@
         "appleId": "alvaro.troya@outlook.com",
         "ascAppId": "6758789066",
         "appleTeamId": "9ZN4MZF8YM"
+      },
+      "android": {
+        "serviceAccountKeyPath": "app_stores/android/keys/panda-quotes-481815-acc49f939268.json",
+        "track": "internal"
       }
     }
   }

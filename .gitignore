@@ -40,6 +40,10 @@ yarn-error.*
 
 app-example
 
+# Android Google Play Console Key
+app_stores/android/keys
+
+
 # generated native folders
 /ios
 /android
