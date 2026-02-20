@@ -12,10 +12,23 @@
       "distribution": "internal"
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "android": {
+        "buildType": "app-bundle"
+      }
     }
   },
   "submit": {
-    "production": {}
+    "production": {
+      "ios": {
+        "appleId": "alvaro.troya@outlook.com",
+        "ascAppId": "6758789066",
+        "appleTeamId": "9ZN4MZF8YM"
+      },
+      "android": {
+        "serviceAccountKeyPath": "$GOOGLE_SERVICE_ACCOUNT_KEY",
+        "track": "internal"
+      }
+    }
   }
 }
