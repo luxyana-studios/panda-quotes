@@ -1,24 +1,14 @@
 name: EAS Build
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
   workflow_dispatch:
     inputs:
       platform:
-        description: 'Platform to build'
+        description: 'Platform'
         required: true
         default: 'all'
         type: choice
         options: [all, android, ios]
-      profile:
-        description: 'Build profile'
-        required: true
-        default: 'preview'
-        type: choice
-        options: [development, preview, production]
 
 jobs:
   lint:
@@ -37,7 +27,6 @@ jobs:
     name: EAS Build
     runs-on: ubuntu-latest
     needs: lint
-    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -49,8 +38,11 @@ jobs:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
       - run: npm ci
-      - name: Build
+      - name: Build and submit
         run: |
-          PLATFORM=${{ github.event.inputs.platform || 'all' }}
-          PROFILE=${{ github.event.inputs.profile || 'preview' }}
-          eas build --platform $PLATFORM --profile $PROFILE --non-interactive --no-wait
+          eas build \
+            --platform ${{ inputs.platform }} \
+            --profile production \
+            --non-interactive \
+            --no-wait \
+            --auto-submit

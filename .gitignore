@@ -1,6 +1,5 @@
 # Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
 .idea/
-.claude/
 .vscode/
 
 # dependencies
@@ -40,6 +39,10 @@ yarn-error.*
 *.tsbuildinfo
 
 app-example
+
+# Android Google Play Console Key
+app_stores/android/keys
+
 
 # generated native folders
 /ios
