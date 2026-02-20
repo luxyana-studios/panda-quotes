@@ -19,9 +19,9 @@
     "production": {
       "ios": {
         "ascAppId": "6758789066",
-        "appleApiKeyId": "$APPLE_API_KEY_ID",
-        "appleApiIssuerID": "$APPLE_API_ISSUER_ID",
-        "appleApiKey": "$APPLE_API_KEY",
+        "ascApiKeyId": "$APPLE_API_KEY_ID",
+        "ascApiKeyIssuerId": "$APPLE_API_ISSUER_ID",
+        "ascApiKeyPath": "$APPLE_API_KEY"
       },
       "android": {
         "serviceAccountKeyPath": "$GOOGLE_SERVICE_ACCOUNT_KEY",
