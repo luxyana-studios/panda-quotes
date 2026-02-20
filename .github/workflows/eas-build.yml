@@ -9,12 +9,6 @@ on:
         default: 'all'
         type: choice
         options: [all, android, ios]
-      profile:
-        description: 'Build profile'
-        required: true
-        default: 'development'
-        type: choice
-        options: [development, production]
 
 jobs:
   lint:
@@ -44,15 +38,11 @@ jobs:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
       - run: npm ci
-      - name: Build (and submit if production)
+      - name: Build and submit
         run: |
-          EXTRA_FLAGS=""
-          if [ "${{ inputs.profile }}" = "production" ]; then
-            EXTRA_FLAGS="--auto-submit"
-          fi
           eas build \
             --platform ${{ inputs.platform }} \
-            --profile ${{ inputs.profile }} \
+            --profile production \
             --non-interactive \
             --no-wait \
-            $EXTRA_FLAGS
+            --auto-submit
