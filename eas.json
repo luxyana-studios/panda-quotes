@@ -8,9 +8,6 @@
       "developmentClient": true,
       "distribution": "internal"
     },
-    "preview": {
-      "distribution": "internal"
-    },
     "production": {
       "autoIncrement": true,
       "android": {
@@ -21,9 +18,10 @@
   "submit": {
     "production": {
       "ios": {
-        "appleId": "alvaro.troya@outlook.com",
         "ascAppId": "6758789066",
-        "appleTeamId": "9ZN4MZF8YM"
+        "appleApiKeyId": "$APPLE_API_KEY_ID",
+        "appleApiIssuerID": "$APPLE_API_ISSUER_ID",
+        "appleApiKey": "$APPLE_API_KEY",
       },
       "android": {
         "serviceAccountKeyPath": "$GOOGLE_SERVICE_ACCOUNT_KEY",
