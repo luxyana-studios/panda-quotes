@@ -20,7 +20,6 @@
         "ascApiKeyPath": "$APPLE_API_KEY"
       },
       "android": {
-        "serviceAccountKeyPath": "$GOOGLE_SERVICE_ACCOUNT_KEY",
         "track": "internal"
       }
     }
