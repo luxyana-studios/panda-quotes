@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Text, View, Pressable } from 'react-native';
+import { Text, View, Pressable, Alert } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -9,6 +9,7 @@ import Animated, {
   Easing,
 } from 'react-native-reanimated';
 import { onboardingStyles as styles } from '@/styles/onboarding.styles';
+import { requestPermissionAndSchedule } from '@/services/notifications';
 
 interface NotificationsScreenProps {
   onNext: () => void;
@@ -22,8 +23,30 @@ export function NotificationsScreen({
   onBack,
 }: NotificationsScreenProps) {
   const [frequency, setFrequency] = useState(3);
+  const [loading, setLoading] = useState(false);
   const startTime = '8:00 AM';
   const endTime = '9:00 PM';
+
+  const handleEnableNotifications = async () => {
+    if (loading) return;
+    setLoading(true);
+    try {
+      const granted = await requestPermissionAndSchedule(frequency);
+      if (!granted) {
+        Alert.alert(
+          'Notifications disabled',
+          'You can enable notifications later in your device Settings.',
+          [{ text: 'OK', onPress: onNext }],
+        );
+        return;
+      }
+      onNext();
+    } catch {
+      onNext();
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const cardOpacity = useSharedValue(0);
   const cardTranslateY = useSharedValue(20);
@@ -168,8 +191,14 @@ export function NotificationsScreen({
       </View>
 
       <View style={styles.bottomButtonContainer}>
-        <Pressable style={styles.nextButton} onPress={onNext}>
-          <Text style={styles.nextButtonText}>Next</Text>
+        <Pressable
+          style={[styles.nextButton, loading && styles.nextButtonDisabled]}
+          onPress={handleEnableNotifications}
+          disabled={loading}
+        >
+          <Text style={[styles.nextButtonText, loading && styles.nextButtonTextDisabled]}>
+            {loading ? 'Setting up...' : 'Enable notifications'}
+          </Text>
         </Pressable>
       </View>
     </View>

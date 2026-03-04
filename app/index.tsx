@@ -1,15 +1,20 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { StartScreen } from "@/components/StartScreen";
 import { TakeInScreen } from "@/components/TakeInScreen";
 import { ContemplateScreen } from "@/components/ContemplateScreen";
 import { OnboardingFlow } from "@/components/onboarding/OnboardingFlow";
 import { useQuoteManager } from "@/hooks/useQuoteManager";
+import { rescheduleNotificationsIfNeeded } from "@/services/notifications";
 
 type Screen = 'onboarding' | 'start' | 'takeIn' | 'contemplate';
 
 export default function Index() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('onboarding');
   const { currentQuote, getNextQuote } = useQuoteManager();
+
+  useEffect(() => {
+    rescheduleNotificationsIfNeeded();
+  }, []);
 
   const handleReady = () => {
     setCurrentScreen('takeIn');
