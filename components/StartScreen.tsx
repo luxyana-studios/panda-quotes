@@ -11,6 +11,8 @@ import Animated, {
 } from 'react-native-reanimated';
 import { styles } from '@/styles/index.styles';
 
+const pandaVideo = require('@/assets/panda-animate.mp4');
+
 interface StartScreenProps {
   onReady: () => void;
 }
@@ -35,7 +37,7 @@ export function StartScreen({ onReady }: StartScreenProps) {
   const staticImageOpacity = useSharedValue(1);
   const videoOpacity = useSharedValue(0);
 
-  const player = useVideoPlayer(require('@/assets/panda-animate.mp4'), (p) => {
+  const player = useVideoPlayer(pandaVideo, (p) => {
     p.loop = false;
   });
 
@@ -80,23 +82,44 @@ export function StartScreen({ onReady }: StartScreenProps) {
   useEffect(() => {
     const timer = setTimeout(() => {
       imageOpacity.value = withTiming(1, { duration: 900, easing: EASE_OUT });
-      imageTranslateY.value = withTiming(0, { duration: 900, easing: EASE_OUT });
+      imageTranslateY.value = withTiming(0, {
+        duration: 900,
+        easing: EASE_OUT,
+      });
 
-      text1Opacity.value = withDelay(400, withTiming(1, { duration: 900, easing: EASE_OUT }));
-      text1TranslateY.value = withDelay(400, withTiming(0, { duration: 900, easing: EASE_OUT }));
+      text1Opacity.value = withDelay(
+        400,
+        withTiming(1, { duration: 900, easing: EASE_OUT })
+      );
+      text1TranslateY.value = withDelay(
+        400,
+        withTiming(0, { duration: 900, easing: EASE_OUT })
+      );
 
-      text2Opacity.value = withDelay(1200, withTiming(1, { duration: 900, easing: EASE_OUT }));
-      text2TranslateY.value = withDelay(1200, withTiming(0, { duration: 900, easing: EASE_OUT }));
+      text2Opacity.value = withDelay(
+        1200,
+        withTiming(1, { duration: 900, easing: EASE_OUT })
+      );
+      text2TranslateY.value = withDelay(
+        1200,
+        withTiming(0, { duration: 900, easing: EASE_OUT })
+      );
 
       setTimeout(() => {
         setShowButton(true);
-        buttonOpacity.value = withTiming(1, { duration: 700, easing: EASE_OUT });
-        buttonTranslateY.value = withTiming(0, { duration: 700, easing: EASE_OUT });
+        buttonOpacity.value = withTiming(1, {
+          duration: 700,
+          easing: EASE_OUT,
+        });
+        buttonTranslateY.value = withTiming(0, {
+          duration: 700,
+          easing: EASE_OUT,
+        });
       }, 2200);
     }, 100);
     return () => clearTimeout(timer);
-  // Shared values are stable refs — safe to omit from deps
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // Shared values are stable refs — safe to omit from deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // ── Video end → return and transition ────────────────────────
@@ -106,7 +129,10 @@ export function StartScreen({ onReady }: StartScreenProps) {
       if (!isAnimatingRef.current) return;
 
       // Crossfade back to static image
-      staticImageOpacity.value = withTiming(1, { duration: 400, easing: EASE_OUT });
+      staticImageOpacity.value = withTiming(1, {
+        duration: 400,
+        easing: EASE_OUT,
+      });
       videoOpacity.value = withTiming(0, { duration: 400, easing: EASE_OUT });
 
       // Circle scales back with spring
@@ -117,7 +143,7 @@ export function StartScreen({ onReady }: StartScreenProps) {
       setTimeout(onReady, 650);
     });
     return () => subscription.remove();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [player, onReady]);
 
   // ── Button press → start animation ──────────────────────────
@@ -134,8 +160,14 @@ export function StartScreen({ onReady }: StartScreenProps) {
     circleGlow.value = withTiming(1, { duration: 700 });
 
     // Crossfade static image → video
-    staticImageOpacity.value = withTiming(0, { duration: 300, easing: EASE_OUT });
-    videoOpacity.value = withDelay(200, withTiming(1, { duration: 300, easing: EASE_OUT }));
+    staticImageOpacity.value = withTiming(0, {
+      duration: 300,
+      easing: EASE_OUT,
+    });
+    videoOpacity.value = withDelay(
+      200,
+      withTiming(1, { duration: 300, easing: EASE_OUT })
+    );
 
     // Play video after fade starts
     setTimeout(() => player.play(), 150);
@@ -148,7 +180,9 @@ export function StartScreen({ onReady }: StartScreenProps) {
       <View style={styles.topDecoration} />
       <View style={styles.bottomDecoration} />
 
-      <Animated.View style={[styles.pandaImageWrapper, imageStyle, circleWrapperStyle]}>
+      <Animated.View
+        style={[styles.pandaImageWrapper, imageStyle, circleWrapperStyle]}
+      >
         {/* Static image */}
         <Animated.View style={[StyleSheet.absoluteFill, staticImageStyle]}>
           <Image
