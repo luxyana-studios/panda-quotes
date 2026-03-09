@@ -66,22 +66,55 @@ export function WelcomeScreen({ onNext }: WelcomeScreenProps) {
       const stagger = 250;
 
       imageOpacity.value = withTiming(1, { duration: dur, easing: EASE_OUT });
-      imageTranslateY.value = withTiming(0, { duration: dur, easing: EASE_OUT });
+      imageTranslateY.value = withTiming(0, {
+        duration: dur,
+        easing: EASE_OUT,
+      });
 
-      titleOpacity.value = withDelay(stagger, withTiming(1, { duration: dur, easing: EASE_OUT }));
-      titleTranslateY.value = withDelay(stagger, withTiming(0, { duration: dur, easing: EASE_OUT }));
+      titleOpacity.value = withDelay(
+        stagger,
+        withTiming(1, { duration: dur, easing: EASE_OUT })
+      );
+      titleTranslateY.value = withDelay(
+        stagger,
+        withTiming(0, { duration: dur, easing: EASE_OUT })
+      );
 
-      subtitleOpacity.value = withDelay(stagger * 2, withTiming(1, { duration: dur, easing: EASE_OUT }));
-      subtitleTranslateY.value = withDelay(stagger * 2, withTiming(0, { duration: dur, easing: EASE_OUT }));
+      subtitleOpacity.value = withDelay(
+        stagger * 2,
+        withTiming(1, { duration: dur, easing: EASE_OUT })
+      );
+      subtitleTranslateY.value = withDelay(
+        stagger * 2,
+        withTiming(0, { duration: dur, easing: EASE_OUT })
+      );
 
-      dividerOpacity.value = withDelay(stagger * 3, withTiming(1, { duration: 600, easing: EASE_OUT }));
-      dividerScale.value = withDelay(stagger * 3, withTiming(1, { duration: 600, easing: EASE_OUT }));
+      dividerOpacity.value = withDelay(
+        stagger * 3,
+        withTiming(1, { duration: 600, easing: EASE_OUT })
+      );
+      dividerScale.value = withDelay(
+        stagger * 3,
+        withTiming(1, { duration: 600, easing: EASE_OUT })
+      );
 
-      descriptionOpacity.value = withDelay(stagger * 4, withTiming(1, { duration: dur, easing: EASE_OUT }));
-      descriptionTranslateY.value = withDelay(stagger * 4, withTiming(0, { duration: dur, easing: EASE_OUT }));
+      descriptionOpacity.value = withDelay(
+        stagger * 4,
+        withTiming(1, { duration: dur, easing: EASE_OUT })
+      );
+      descriptionTranslateY.value = withDelay(
+        stagger * 4,
+        withTiming(0, { duration: dur, easing: EASE_OUT })
+      );
 
-      buttonOpacity.value = withDelay(stagger * 5, withTiming(1, { duration: dur, easing: EASE_OUT }));
-      buttonTranslateY.value = withDelay(stagger * 5, withTiming(0, { duration: dur, easing: EASE_OUT }));
+      buttonOpacity.value = withDelay(
+        stagger * 5,
+        withTiming(1, { duration: dur, easing: EASE_OUT })
+      );
+      buttonTranslateY.value = withDelay(
+        stagger * 5,
+        withTiming(0, { duration: dur, easing: EASE_OUT })
+      );
     }, 100);
     return () => clearTimeout(timer);
   }, []);
@@ -101,7 +134,7 @@ export function WelcomeScreen({ onNext }: WelcomeScreenProps) {
         </Animated.View>
 
         <Animated.Text style={[styles.welcomeTitle, titleStyle]}>
-          {"Hey, I'm Modi!"}
+          {"Hey, I'm Hagu!"}
         </Animated.Text>
 
         <Animated.Text style={[styles.welcomeSubtitle, subtitleStyle]}>
@@ -111,7 +144,9 @@ export function WelcomeScreen({ onNext }: WelcomeScreenProps) {
         <Animated.View style={[styles.welcomeDivider, dividerStyle]} />
 
         <Animated.Text style={[styles.welcomeDescription, descriptionStyle]}>
-          {"Every day, I'll bring you thoughtful quotes to inspire reflection and bring a little peace to your day."}
+          {
+            "Every day, I'll bring you thoughtful quotes to inspire reflection and bring a little peace to your day."
+          }
         </Animated.Text>
 
         <Animated.View style={buttonStyle}>

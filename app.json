@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "panda-quotes",
+    "name": "Hagu the Panda",
     "slug": "panda-quotes",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -56,6 +56,6 @@
         "projectId": "40c82158-5ff4-4ff4-ae9d-5d2177dc014b"
       }
     },
-    "owner": "luxyana-studios"
+    "owner": "davidserrano"
   }
 }

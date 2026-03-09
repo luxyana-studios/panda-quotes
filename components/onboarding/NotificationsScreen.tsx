@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Text, View, Pressable, Alert } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -36,7 +37,7 @@ export function NotificationsScreen({
         Alert.alert(
           'Notifications disabled',
           'You can enable notifications later in your device Settings.',
-          [{ text: 'OK', onPress: onNext }],
+          [{ text: 'OK', onPress: onNext }]
         );
         return;
       }
@@ -67,8 +68,14 @@ export function NotificationsScreen({
     const timer = setTimeout(() => {
       cardOpacity.value = withTiming(1, { duration: 700, easing: EASE_OUT });
       cardTranslateY.value = withTiming(0, { duration: 700, easing: EASE_OUT });
-      controlsOpacity.value = withDelay(300, withTiming(1, { duration: 700, easing: EASE_OUT }));
-      controlsTranslateY.value = withDelay(300, withTiming(0, { duration: 700, easing: EASE_OUT }));
+      controlsOpacity.value = withDelay(
+        300,
+        withTiming(1, { duration: 700, easing: EASE_OUT })
+      );
+      controlsTranslateY.value = withDelay(
+        300,
+        withTiming(0, { duration: 700, easing: EASE_OUT })
+      );
     }, 50);
     return () => clearTimeout(timer);
   }, []);
@@ -80,6 +87,7 @@ export function NotificationsScreen({
 
   const decrementFrequency = () => {
     if (frequency > 1) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       frequencyScale.value = withSpring(0.85, { damping: 10 }, () => {
         frequencyScale.value = withSpring(1, { damping: 10 });
       });
@@ -89,6 +97,7 @@ export function NotificationsScreen({
 
   const incrementFrequency = () => {
     if (frequency < 5) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       frequencyScale.value = withSpring(1.15, { damping: 10 }, () => {
         frequencyScale.value = withSpring(1, { damping: 10 });
       });
@@ -113,11 +122,9 @@ export function NotificationsScreen({
       </View>
 
       <View style={styles.screenContent}>
-        <Text style={styles.heading}>
-          {"Stay inspired daily"}
-        </Text>
+        <Text style={styles.heading}>{'Stay inspired daily'}</Text>
         <Text style={styles.subtitle}>
-          {"Get gentle reminders with wisdom throughout your day"}
+          {'Get gentle reminders with wisdom throughout your day'}
         </Text>
 
         <Animated.View style={[styles.notificationCard, cardStyle]}>
@@ -196,9 +203,17 @@ export function NotificationsScreen({
           onPress={handleEnableNotifications}
           disabled={loading}
         >
-          <Text style={[styles.nextButtonText, loading && styles.nextButtonTextDisabled]}>
+          <Text
+            style={[
+              styles.nextButtonText,
+              loading && styles.nextButtonTextDisabled,
+            ]}
+          >
             {loading ? 'Setting up...' : 'Enable notifications'}
           </Text>
+        </Pressable>
+        <Pressable style={styles.skipLink} onPress={onNext} disabled={loading}>
+          <Text style={styles.skipLinkText}>Maybe later</Text>
         </Pressable>
       </View>
     </View>

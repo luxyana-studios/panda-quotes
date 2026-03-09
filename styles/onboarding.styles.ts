@@ -461,6 +461,15 @@ export const onboardingStyles = StyleSheet.create({
   nextButtonTextDisabled: {
     color: colors.brandPrimary,
   },
+  skipLink: {
+    alignItems: 'center',
+    paddingVertical: 12,
+  },
+  skipLinkText: {
+    fontSize: 14,
+    color: colors.brandPrimary,
+    fontWeight: '500',
+  },
 
   // ─── Welcome back screen (Screen 5) ───────────────────────
   welcomeBackContainer: {
