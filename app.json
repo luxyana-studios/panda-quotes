@@ -43,7 +43,8 @@
         {
           "sounds": []
         }
-      ]
+      ],
+      "expo-video"
     ],
     "experiments": {
       "typedRoutes": true,
