@@ -73,6 +73,8 @@ async function scheduleNotifications(frequency: number): Promise<void> {
   const quotes = getShuffledQuotes(DAYS_AHEAD * frequency);
   let quoteIndex = 0;
 
+  const schedulePromises: Promise<string>[] = [];
+
   for (let dayOffset = 0; dayOffset < DAYS_AHEAD; dayOffset++) {
     for (const { hour, minute } of times) {
       const date = new Date(
@@ -87,19 +89,23 @@ async function scheduleNotifications(frequency: number): Promise<void> {
       // Skip times already passed today
       if (date <= now) continue;
 
-      await Notifications.scheduleNotificationAsync({
-        content: {
-          title: 'Panda Quotes 🐼',
-          body: quotes[quoteIndex++ % quotes.length],
-          ...(Platform.OS === 'android' && { channelId: CHANNEL_ID }),
-        },
-        trigger: {
-          type: Notifications.SchedulableTriggerInputTypes.DATE,
-          date,
-        },
-      });
+      schedulePromises.push(
+        Notifications.scheduleNotificationAsync({
+          content: {
+            title: 'Panda Quotes 🐼',
+            body: quotes[quoteIndex++ % quotes.length],
+            ...(Platform.OS === 'android' && { channelId: CHANNEL_ID }),
+          },
+          trigger: {
+            type: Notifications.SchedulableTriggerInputTypes.DATE,
+            date,
+          },
+        })
+      );
     }
   }
+
+  await Promise.all(schedulePromises);
 
   await AsyncStorage.setItem(STORAGE_KEY_LAST_SCHEDULED, String(Date.now()));
 }
