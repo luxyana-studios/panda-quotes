@@ -6,7 +6,8 @@ import { RED_PANDA_QUOTES } from '@/constants/quotes';
 const STORAGE_KEY_FREQUENCY = 'notification_frequency';
 const STORAGE_KEY_GRANTED = 'notification_granted';
 const STORAGE_KEY_LAST_SCHEDULED = 'notification_last_scheduled';
-const CHANNEL_ID = 'panda-quotes-daily';
+const CHANNEL_ID = 'panda-quotes-v2';
+const CHANNEL_ID_LEGACY = 'panda-quotes-daily';
 
 const WINDOW_START_HOUR = 8; // 8:00 AM
 const WINDOW_END_HOUR = 21; // 9:00 PM
@@ -25,10 +26,12 @@ Notifications.setNotificationHandler({
 
 async function ensureAndroidChannel(): Promise<void> {
   if (Platform.OS !== 'android') return;
+  // Delete legacy channel so importance upgrade takes effect on existing devices
+  await Notifications.deleteNotificationChannelAsync(CHANNEL_ID_LEGACY).catch(() => {});
   await Notifications.setNotificationChannelAsync(CHANNEL_ID, {
     name: 'Daily Quotes',
     description: 'Gentle daily reminders with panda wisdom',
-    importance: Notifications.AndroidImportance.DEFAULT,
+    importance: Notifications.AndroidImportance.HIGH,
     vibrationPattern: [0, 150, 100, 150],
     lightColor: '#d4a574',
     lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
@@ -94,7 +97,10 @@ async function scheduleNotifications(frequency: number): Promise<void> {
           content: {
             title: 'Panda Quotes 🐼',
             body: quotes[quoteIndex++ % quotes.length],
-            ...(Platform.OS === 'android' && { channelId: CHANNEL_ID }),
+            ...(Platform.OS === 'android' && {
+              channelId: CHANNEL_ID,
+              priority: Notifications.AndroidNotificationPriority.HIGH,
+            }),
           },
           trigger: {
             type: Notifications.SchedulableTriggerInputTypes.DATE,
