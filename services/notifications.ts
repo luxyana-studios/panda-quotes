@@ -15,7 +15,8 @@ const CHANNEL_ID_LEGACY = 'panda-quotes-daily';
 const WINDOW_START_HOUR = 8; // 8:00 AM
 const WINDOW_END_HOUR = 21; // 9:00 PM
 const WINDOW_MINUTES = (WINDOW_END_HOUR - WINDOW_START_HOUR) * 60; // 780
-const DAYS_AHEAD = 12; // iOS cap is 64; 12 days × 5 max freq = 60 notifications
+// iOS cap is 64 notifications; Android has no practical limit
+const DAYS_AHEAD = Platform.OS === 'android' ? 60 : 12;
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
