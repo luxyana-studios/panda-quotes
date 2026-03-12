@@ -10,7 +10,7 @@ import Animated, {
   Easing,
 } from 'react-native-reanimated';
 import { onboardingStyles as styles } from '@/styles/onboarding.styles';
-import { requestPermissionAndSchedule } from '@/services/notifications';
+import { requestPermissionAndSchedule, MIN_FREQUENCY, MAX_FREQUENCY } from '@/services/notifications';
 
 interface NotificationsScreenProps {
   onNext: () => void;
@@ -86,7 +86,7 @@ export function NotificationsScreen({
   }));
 
   const decrementFrequency = () => {
-    if (frequency > 1) {
+    if (frequency > MIN_FREQUENCY) {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       frequencyScale.value = withSpring(0.85, { damping: 10 }, () => {
         frequencyScale.value = withSpring(1, { damping: 10 });
@@ -96,7 +96,7 @@ export function NotificationsScreen({
   };
 
   const incrementFrequency = () => {
-    if (frequency < 5) {
+    if (frequency < MAX_FREQUENCY) {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       frequencyScale.value = withSpring(1.15, { damping: 10 }, () => {
         frequencyScale.value = withSpring(1, { damping: 10 });
@@ -152,7 +152,7 @@ export function NotificationsScreen({
             <Pressable
               style={[
                 styles.frequencyButton,
-                frequency <= 1 && { opacity: 0.4 },
+                frequency <= MIN_FREQUENCY && { opacity: 0.4 },
               ]}
               onPress={decrementFrequency}
             >
@@ -167,7 +167,7 @@ export function NotificationsScreen({
             <Pressable
               style={[
                 styles.frequencyButton,
-                frequency >= 5 && { opacity: 0.4 },
+                frequency >= MAX_FREQUENCY && { opacity: 0.4 },
               ]}
               onPress={incrementFrequency}
             >

@@ -9,6 +9,8 @@ const CHANNEL_ID = 'panda-quotes';
 const WINDOW_START_HOUR = 8; // 8:00 AM
 const WINDOW_END_HOUR = 21; // 9:00 PM
 const WINDOW_MINUTES = (WINDOW_END_HOUR - WINDOW_START_HOUR) * 60;
+export const MIN_FREQUENCY = 1;
+export const MAX_FREQUENCY = 5;
 
 const NOTIFICATION_TEASERS = [
   "I've been sitting with a thought for you 🐼",
@@ -45,6 +47,9 @@ async function ensureChannel(): Promise<void> {
 function computeNotificationTimes(
   frequency: number
 ): { hour: number; minute: number }[] {
+  // Dividing by (frequency + 1) guarantees the last slot is always one
+  // interval before the window end, so no notification ever exceeds
+  // WINDOW_END_HOUR (e.g. 5 daily → last at 6:50 PM, well under 9 PM).
   const interval = WINDOW_MINUTES / (frequency + 1);
   return Array.from({ length: frequency }, (_, i) => {
     const totalMinutes = WINDOW_START_HOUR * 60 + Math.round(interval * (i + 1));
@@ -52,7 +57,8 @@ function computeNotificationTimes(
   });
 }
 
-async function scheduleNotifications(frequency: number): Promise<void> {
+async function scheduleNotifications(rawFrequency: number): Promise<void> {
+  const frequency = Math.min(Math.max(rawFrequency, MIN_FREQUENCY), MAX_FREQUENCY);
   await ensureChannel();
   await Notifications.cancelAllScheduledNotificationsAsync();
 
