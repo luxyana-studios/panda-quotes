@@ -2,14 +2,16 @@ import { useState, useEffect } from "react";
 import { StartScreen } from "@/components/StartScreen";
 import { TakeInScreen } from "@/components/TakeInScreen";
 import { ContemplateScreen } from "@/components/ContemplateScreen";
+import { TipJarScreen } from "@/components/TipJarScreen";
 import { OnboardingFlow } from "@/components/onboarding/OnboardingFlow";
 import { useQuoteManager } from "@/hooks/useQuoteManager";
 import { rescheduleNotificationsIfNeeded } from "@/services/notifications";
 
-type Screen = 'onboarding' | 'start' | 'takeIn' | 'contemplate';
+type Screen = 'onboarding' | 'start' | 'takeIn' | 'contemplate' | 'tipJar';
 
 export default function Index() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('onboarding');
+  const [prevScreen, setPrevScreen] = useState<Screen>('start');
   const { currentQuote, getNextQuote } = useQuoteManager();
 
   useEffect(() => {
@@ -34,11 +36,20 @@ export default function Index() {
     setCurrentScreen('start');
   };
 
+  const handleOpenTipJar = () => {
+    setPrevScreen(currentScreen);
+    setCurrentScreen('tipJar');
+  };
+
+  const handleCloseTipJar = () => {
+    setCurrentScreen(prevScreen);
+  };
+
   switch (currentScreen) {
     case 'onboarding':
       return <OnboardingFlow onComplete={() => setCurrentScreen('start')} />;
     case 'start':
-      return <StartScreen onReady={handleReady} />;
+      return <StartScreen onReady={handleReady} onSupportUs={handleOpenTipJar} />;
     case 'takeIn':
       return (
         <TakeInScreen
@@ -54,5 +65,7 @@ export default function Index() {
           onMoveOn={handleClose}
         />
       );
+    case 'tipJar':
+      return <TipJarScreen onBack={handleCloseTipJar} />;
   }
 }
