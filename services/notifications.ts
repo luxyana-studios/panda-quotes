@@ -1,5 +1,4 @@
 import * as Notifications from 'expo-notifications';
-import * as IntentLauncher from 'expo-intent-launcher';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 import { RED_PANDA_QUOTES } from '@/constants/quotes';
@@ -7,8 +6,6 @@ import { RED_PANDA_QUOTES } from '@/constants/quotes';
 const STORAGE_KEY_FREQUENCY = 'notification_frequency';
 const STORAGE_KEY_GRANTED = 'notification_granted';
 const STORAGE_KEY_LAST_SCHEDULED = 'notification_last_scheduled';
-const STORAGE_KEY_BATTERY_REQUESTED = 'battery_optimization_requested';
-const ANDROID_PACKAGE = 'com.luxyanastudios.pandaquotes';
 const CHANNEL_ID = 'panda-quotes-v2';
 const CHANNEL_ID_LEGACY = 'panda-quotes-daily';
 
@@ -27,21 +24,6 @@ Notifications.setNotificationHandler({
     shouldSetBadge: false,
   }),
 });
-
-async function requestBatteryExemption(): Promise<void> {
-  if (Platform.OS !== 'android') return;
-  const already = await AsyncStorage.getItem(STORAGE_KEY_BATTERY_REQUESTED);
-  if (already === 'true') return;
-  try {
-    await IntentLauncher.startActivityAsync(
-      IntentLauncher.ActivityAction.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
-      { data: `package:${ANDROID_PACKAGE}` }
-    );
-  } catch {
-    // Some devices don't support this intent — continue silently
-  }
-  await AsyncStorage.setItem(STORAGE_KEY_BATTERY_REQUESTED, 'true');
-}
 
 async function ensureAndroidChannel(): Promise<void> {
   if (Platform.OS !== 'android') return;
@@ -150,7 +132,6 @@ export async function requestPermissionAndSchedule(
     return false;
   }
 
-  await requestBatteryExemption();
   await scheduleNotifications(frequency);
   await AsyncStorage.setItem(STORAGE_KEY_FREQUENCY, String(frequency));
   await AsyncStorage.setItem(STORAGE_KEY_GRANTED, 'true');
