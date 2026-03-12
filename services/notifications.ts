@@ -4,15 +4,19 @@ import { Platform } from 'react-native';
 
 const STORAGE_KEY_FREQUENCY = 'notification_frequency';
 const STORAGE_KEY_GRANTED = 'notification_granted';
-const STORAGE_KEY_LAST_SCHEDULED = 'notification_last_scheduled';
-const CHANNEL_ID = 'panda-quotes-v2';
-const CHANNEL_ID_LEGACY = 'panda-quotes-daily';
+const CHANNEL_ID = 'panda-quotes';
 
 const WINDOW_START_HOUR = 8; // 8:00 AM
 const WINDOW_END_HOUR = 21; // 9:00 PM
-const WINDOW_MINUTES = (WINDOW_END_HOUR - WINDOW_START_HOUR) * 60; // 780
-// iOS cap is 64 notifications; Android has no practical limit
-const DAYS_AHEAD = Platform.OS === 'android' ? 60 : 12;
+const WINDOW_MINUTES = (WINDOW_END_HOUR - WINDOW_START_HOUR) * 60;
+
+const NOTIFICATION_TEASERS = [
+  'Hagu has some wisdom for you 🐼',
+  'A moment of reflection awaits you 🐼',
+  'Your daily dose of panda wisdom is here 🐼',
+  'Take a mindful pause — Hagu is waiting 🐼',
+  "Ready for today's thought? 🐼",
+];
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -24,14 +28,12 @@ Notifications.setNotificationHandler({
   }),
 });
 
-async function ensureAndroidChannel(): Promise<void> {
+async function ensureChannel(): Promise<void> {
   if (Platform.OS !== 'android') return;
-  // Delete legacy channel so importance upgrade takes effect on existing devices
-  await Notifications.deleteNotificationChannelAsync(CHANNEL_ID_LEGACY).catch(() => {});
   await Notifications.setNotificationChannelAsync(CHANNEL_ID, {
     name: 'Daily Quotes',
     description: 'Gentle daily reminders with panda wisdom',
-    importance: Notifications.AndroidImportance.HIGH,
+    importance: Notifications.AndroidImportance.DEFAULT,
     vibrationPattern: [0, 150, 100, 150],
     lightColor: '#d4a574',
     lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
@@ -40,78 +42,37 @@ async function ensureAndroidChannel(): Promise<void> {
   });
 }
 
-const NOTIFICATION_TEASERS = [
-  'Hagu has some wisdom for you 🐼',
-  'A moment of reflection awaits you 🐼',
-  'Your daily dose of panda wisdom is here 🐼',
-  'Take a mindful pause — Hagu is waiting 🐼',
-  'Ready for today\'s thought? 🐼',
-];
-
 function computeNotificationTimes(
   frequency: number
 ): { hour: number; minute: number }[] {
-  const times: { hour: number; minute: number }[] = [];
   const interval = WINDOW_MINUTES / (frequency + 1);
-
-  for (let i = 1; i <= frequency; i++) {
-    const minutesFromStart = Math.round(interval * i);
-    const totalMinutes = WINDOW_START_HOUR * 60 + minutesFromStart;
-    times.push({
-      hour: Math.floor(totalMinutes / 60),
-      minute: totalMinutes % 60,
-    });
-  }
-
-  return times;
+  return Array.from({ length: frequency }, (_, i) => {
+    const totalMinutes = WINDOW_START_HOUR * 60 + Math.round(interval * (i + 1));
+    return { hour: Math.floor(totalMinutes / 60), minute: totalMinutes % 60 };
+  });
 }
 
 async function scheduleNotifications(frequency: number): Promise<void> {
-  await ensureAndroidChannel();
+  await ensureChannel();
   await Notifications.cancelAllScheduledNotificationsAsync();
 
-  const times = computeNotificationTimes(frequency);
-  const now = new Date();
-  let teaserIndex = 0;
-
-  const schedulePromises: Promise<string>[] = [];
-
-  for (let dayOffset = 0; dayOffset < DAYS_AHEAD; dayOffset++) {
-    for (const { hour, minute } of times) {
-      const date = new Date(
-        now.getFullYear(),
-        now.getMonth(),
-        now.getDate() + dayOffset,
-        hour,
-        minute,
-        0
-      );
-
-      // Skip times already passed today
-      if (date <= now) continue;
-
-      schedulePromises.push(
-        Notifications.scheduleNotificationAsync({
-          content: {
-            title: 'Panda Quotes',
-            body: NOTIFICATION_TEASERS[teaserIndex++ % NOTIFICATION_TEASERS.length],
-            ...(Platform.OS === 'android' && {
-              channelId: CHANNEL_ID,
-              priority: Notifications.AndroidNotificationPriority.HIGH,
-            }),
-          },
-          trigger: {
-            type: Notifications.SchedulableTriggerInputTypes.DATE,
-            date,
-          },
-        })
-      );
-    }
-  }
-
-  await Promise.all(schedulePromises);
-
-  await AsyncStorage.setItem(STORAGE_KEY_LAST_SCHEDULED, String(Date.now()));
+  await Promise.all(
+    computeNotificationTimes(frequency).map(({ hour, minute }, index) =>
+      Notifications.scheduleNotificationAsync({
+        content: {
+          title: 'Panda Quotes',
+          body: NOTIFICATION_TEASERS[index % NOTIFICATION_TEASERS.length],
+          ...(Platform.OS === 'android' && { channelId: CHANNEL_ID }),
+        },
+        trigger: {
+          type: Notifications.SchedulableTriggerInputTypes.CALENDAR,
+          hour,
+          minute,
+          repeats: true,
+        },
+      })
+    )
+  );
 }
 
 export async function requestPermissionAndSchedule(
@@ -125,9 +86,7 @@ export async function requestPermissionAndSchedule(
     finalStatus = status;
   }
 
-  if (finalStatus !== 'granted') {
-    return false;
-  }
+  if (finalStatus !== 'granted') return false;
 
   await scheduleNotifications(frequency);
   await AsyncStorage.setItem(STORAGE_KEY_FREQUENCY, String(frequency));
@@ -136,6 +95,8 @@ export async function requestPermissionAndSchedule(
   return true;
 }
 
+// Repeating triggers run indefinitely — rescheduling is only needed
+// if the user changes their frequency setting.
 export async function rescheduleNotificationsIfNeeded(): Promise<void> {
   const granted = await AsyncStorage.getItem(STORAGE_KEY_GRANTED);
   if (granted !== 'true') return;
@@ -143,16 +104,7 @@ export async function rescheduleNotificationsIfNeeded(): Promise<void> {
   const { status } = await Notifications.getPermissionsAsync();
   if (status !== 'granted') return;
 
-  // Only reschedule when coverage drops below ~2 days remaining
-  const lastScheduled = await AsyncStorage.getItem(STORAGE_KEY_LAST_SCHEDULED);
-  if (lastScheduled) {
-    const daysSince =
-      (Date.now() - parseInt(lastScheduled, 10)) / (1000 * 60 * 60 * 24);
-    if (daysSince < 2) return;
-  }
-
   const stored = await AsyncStorage.getItem(STORAGE_KEY_FREQUENCY);
   const frequency = stored ? parseInt(stored, 10) : 3;
-
   await scheduleNotifications(frequency);
 }
