@@ -15,12 +15,13 @@ const pandaVideo = require('@/assets/panda-animate.mp4');
 
 interface StartScreenProps {
   onReady: () => void;
+  onSupportUs: () => void;
 }
 
 const EASE_OUT = Easing.bezier(0.25, 0.46, 0.45, 0.94);
 const EASE_SPRING = Easing.bezier(0.34, 1.56, 0.64, 1);
 
-export function StartScreen({ onReady }: StartScreenProps) {
+export function StartScreen({ onReady, onSupportUs }: StartScreenProps) {
   const [showButton, setShowButton] = useState(false);
   const isAnimatingRef = useRef(false);
 
@@ -212,11 +213,18 @@ export function StartScreen({ onReady }: StartScreenProps) {
         </Animated.Text>
       </View>
 
-      <View style={{ minHeight: 70, justifyContent: 'center' }}>
+      <View style={{ minHeight: 70, justifyContent: 'center', alignItems: 'center', gap: 12 }}>
         {showButton && (
-          <Animated.View style={buttonStyle}>
+          <Animated.View style={[buttonStyle, { alignItems: 'center', gap: 12 }]}>
             <Pressable style={styles.primaryButton} onPress={handleReady}>
               <Text style={styles.primaryButtonText}>{"I'm ready"}</Text>
+            </Pressable>
+            <Pressable
+              style={styles.secondaryButton}
+              onPress={onSupportUs}
+              hitSlop={8}
+            >
+              <Text style={styles.secondaryButtonText}>☕ Support Hagu</Text>
             </Pressable>
           </Animated.View>
         )}
