@@ -1,7 +1,6 @@
 import * as Notifications from 'expo-notifications';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
-import { RED_PANDA_QUOTES } from '@/constants/quotes';
 
 const STORAGE_KEY_FREQUENCY = 'notification_frequency';
 const STORAGE_KEY_GRANTED = 'notification_granted';
@@ -41,14 +40,13 @@ async function ensureAndroidChannel(): Promise<void> {
   });
 }
 
-function getShuffledQuotes(count: number): string[] {
-  const pool = [...RED_PANDA_QUOTES].sort(() => Math.random() - 0.5);
-  const result: string[] = [];
-  while (result.length < count) {
-    result.push(...pool.slice(0, Math.min(pool.length, count - result.length)));
-  }
-  return result;
-}
+const NOTIFICATION_TEASERS = [
+  'Hagu has some wisdom for you 🐼',
+  'A moment of reflection awaits you 🐼',
+  'Your daily dose of panda wisdom is here 🐼',
+  'Take a mindful pause — Hagu is waiting 🐼',
+  'Ready for today\'s thought? 🐼',
+];
 
 function computeNotificationTimes(
   frequency: number
@@ -74,8 +72,7 @@ async function scheduleNotifications(frequency: number): Promise<void> {
 
   const times = computeNotificationTimes(frequency);
   const now = new Date();
-  const quotes = getShuffledQuotes(DAYS_AHEAD * frequency);
-  let quoteIndex = 0;
+  let teaserIndex = 0;
 
   const schedulePromises: Promise<string>[] = [];
 
@@ -96,8 +93,8 @@ async function scheduleNotifications(frequency: number): Promise<void> {
       schedulePromises.push(
         Notifications.scheduleNotificationAsync({
           content: {
-            title: 'Panda Quotes 🐼',
-            body: quotes[quoteIndex++ % quotes.length],
+            title: 'Panda Quotes',
+            body: NOTIFICATION_TEASERS[teaserIndex++ % NOTIFICATION_TEASERS.length],
             ...(Platform.OS === 'android' && {
               channelId: CHANNEL_ID,
               priority: Notifications.AndroidNotificationPriority.HIGH,
