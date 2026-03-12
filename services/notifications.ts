@@ -11,11 +11,11 @@ const WINDOW_END_HOUR = 21; // 9:00 PM
 const WINDOW_MINUTES = (WINDOW_END_HOUR - WINDOW_START_HOUR) * 60;
 
 const NOTIFICATION_TEASERS = [
-  'Hagu has some wisdom for you 🐼',
-  'A moment of reflection awaits you 🐼',
-  'Your daily dose of panda wisdom is here 🐼',
-  'Take a mindful pause — Hagu is waiting 🐼',
-  "Ready for today's thought? 🐼",
+  "I've been sitting with a thought for you 🐼",
+  "I have something to share with you today 🐼",
+  "I've been waiting to offer you a moment of calm 🐼",
+  "I have your daily dose of wisdom ready 🐼",
+  "I've found a thought worth sitting with 🐼",
 ];
 
 Notifications.setNotificationHandler({
