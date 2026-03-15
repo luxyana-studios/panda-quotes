@@ -54,8 +54,14 @@ function CategoryChip({
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      chipOpacity.value = withDelay(delay, withTiming(1, { duration: 500, easing: EASE_OUT }));
-      chipTranslateY.value = withDelay(delay, withTiming(0, { duration: 500, easing: EASE_OUT }));
+      chipOpacity.value = withDelay(
+        delay,
+        withTiming(1, { duration: 500, easing: EASE_OUT })
+      );
+      chipTranslateY.value = withDelay(
+        delay,
+        withTiming(0, { duration: 500, easing: EASE_OUT })
+      );
     }, 50);
     return () => clearTimeout(timer);
   }, []);
@@ -141,7 +147,7 @@ export function CategoriesScreen({
             />
           </View>
 
-          <Text style={styles.heading}>What brings you joy?</Text>
+          <Text style={styles.heading}>What lights you up? ✨</Text>
           <Text style={styles.subtitle}>
             {"Choose the themes you'd like to explore"}
           </Text>

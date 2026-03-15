@@ -15,12 +15,13 @@ const pandaVideo = require('@/assets/panda-animate.mp4');
 
 interface StartScreenProps {
   onReady: () => void;
+  onSettings: () => void;
 }
 
 const EASE_OUT = Easing.bezier(0.25, 0.46, 0.45, 0.94);
 const EASE_SPRING = Easing.bezier(0.34, 1.56, 0.64, 1);
 
-export function StartScreen({ onReady }: StartScreenProps) {
+export function StartScreen({ onReady, onSettings }: StartScreenProps) {
   const [showButton, setShowButton] = useState(false);
   const isAnimatingRef = useRef(false);
 
@@ -179,6 +180,13 @@ export function StartScreen({ onReady }: StartScreenProps) {
     <View style={styles.container}>
       <View style={styles.topDecoration} />
       <View style={styles.bottomDecoration} />
+
+      <Pressable
+        onPress={onSettings}
+        style={{ position: 'absolute', top: 52, right: 24, width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.2)', justifyContent: 'center', alignItems: 'center', zIndex: 10 }}
+      >
+        <Text style={{ fontSize: 18, color: 'rgba(255,255,255,0.85)' }}>{'\u2699'}</Text>
+      </Pressable>
 
       <Animated.View
         style={[styles.pandaImageWrapper, imageStyle, circleWrapperStyle]}

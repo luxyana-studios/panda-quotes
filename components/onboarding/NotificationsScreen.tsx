@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react';
 import { Text, View, Pressable, Alert } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withTiming,
-  withDelay,
   withSpring,
   Easing,
 } from 'react-native-reanimated';
 import { onboardingStyles as styles } from '@/styles/onboarding.styles';
-import { requestPermissionAndSchedule } from '@/services/notifications';
+import { requestPermissionAndSchedule, MIN_FREQUENCY, MAX_FREQUENCY } from '@/services/notifications';
 
 interface NotificationsScreenProps {
   onNext: () => void;
@@ -24,6 +24,7 @@ export function NotificationsScreen({
 }: NotificationsScreenProps) {
   const [frequency, setFrequency] = useState(3);
   const [loading, setLoading] = useState(false);
+  const [permissionGranted, setPermissionGranted] = useState(false);
   const startTime = '8:00 AM';
   const endTime = '9:00 PM';
 
@@ -31,16 +32,17 @@ export function NotificationsScreen({
     if (loading) return;
     setLoading(true);
     try {
-      const granted = await requestPermissionAndSchedule(frequency);
-      if (!granted) {
+      const result = await requestPermissionAndSchedule(frequency);
+      if (result === 'denied') {
         Alert.alert(
           'Notifications disabled',
           'You can enable notifications later in your device Settings.',
-          [{ text: 'OK', onPress: onNext }],
+          [{ text: 'OK', onPress: onNext }]
         );
         return;
       }
-      onNext();
+      setPermissionGranted(true);
+      setTimeout(() => onNext(), 800);
     } catch {
       onNext();
     } finally {
@@ -48,15 +50,8 @@ export function NotificationsScreen({
     }
   };
 
-  const cardOpacity = useSharedValue(0);
-  const cardTranslateY = useSharedValue(20);
   const controlsOpacity = useSharedValue(0);
   const controlsTranslateY = useSharedValue(16);
-
-  const cardStyle = useAnimatedStyle(() => ({
-    opacity: cardOpacity.value,
-    transform: [{ translateY: cardTranslateY.value }],
-  }));
 
   const controlsStyle = useAnimatedStyle(() => ({
     opacity: controlsOpacity.value,
@@ -65,10 +60,8 @@ export function NotificationsScreen({
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      cardOpacity.value = withTiming(1, { duration: 700, easing: EASE_OUT });
-      cardTranslateY.value = withTiming(0, { duration: 700, easing: EASE_OUT });
-      controlsOpacity.value = withDelay(300, withTiming(1, { duration: 700, easing: EASE_OUT }));
-      controlsTranslateY.value = withDelay(300, withTiming(0, { duration: 700, easing: EASE_OUT }));
+      controlsOpacity.value = withTiming(1, { duration: 700, easing: EASE_OUT });
+      controlsTranslateY.value = withTiming(0, { duration: 700, easing: EASE_OUT });
     }, 50);
     return () => clearTimeout(timer);
   }, []);
@@ -79,7 +72,8 @@ export function NotificationsScreen({
   }));
 
   const decrementFrequency = () => {
-    if (frequency > 1) {
+    if (frequency > MIN_FREQUENCY) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       frequencyScale.value = withSpring(0.85, { damping: 10 }, () => {
         frequencyScale.value = withSpring(1, { damping: 10 });
       });
@@ -88,7 +82,8 @@ export function NotificationsScreen({
   };
 
   const incrementFrequency = () => {
-    if (frequency < 5) {
+    if (frequency < MAX_FREQUENCY) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       frequencyScale.value = withSpring(1.15, { damping: 10 }, () => {
         frequencyScale.value = withSpring(1, { damping: 10 });
       });
@@ -113,28 +108,10 @@ export function NotificationsScreen({
       </View>
 
       <View style={styles.screenContent}>
-        <Text style={styles.heading}>
-          {"Stay inspired daily"}
-        </Text>
+        <Text style={styles.heading}>{'Stay inspired daily'}</Text>
         <Text style={styles.subtitle}>
-          {"Get gentle reminders with wisdom throughout your day"}
+          {'Get gentle reminders with wisdom throughout your day'}
         </Text>
-
-        <Animated.View style={[styles.notificationCard, cardStyle]}>
-          <Text style={styles.notificationCardLabel}>Preview</Text>
-          <View style={styles.notificationPreview}>
-            <View style={styles.notificationIcon}>
-              <Text style={styles.notificationIconText}>🐼</Text>
-            </View>
-            <View style={styles.notificationTextGroup}>
-              <Text style={styles.notificationPreviewTitle}>Panda Quotes</Text>
-              <Text style={styles.notificationPreviewBody}>
-                {'"The journey of a thousand miles..."'}
-              </Text>
-            </View>
-            <Text style={styles.notificationPreviewTime}>now</Text>
-          </View>
-        </Animated.View>
 
         <Animated.View style={controlsStyle}>
           <Text style={styles.frequencySectionLabel}>
@@ -145,7 +122,7 @@ export function NotificationsScreen({
             <Pressable
               style={[
                 styles.frequencyButton,
-                frequency <= 1 && { opacity: 0.4 },
+                frequency <= MIN_FREQUENCY && { opacity: 0.4 },
               ]}
               onPress={decrementFrequency}
             >
@@ -160,7 +137,7 @@ export function NotificationsScreen({
             <Pressable
               style={[
                 styles.frequencyButton,
-                frequency >= 5 && { opacity: 0.4 },
+                frequency >= MAX_FREQUENCY && { opacity: 0.4 },
               ]}
               onPress={incrementFrequency}
             >
@@ -192,13 +169,25 @@ export function NotificationsScreen({
 
       <View style={styles.bottomButtonContainer}>
         <Pressable
-          style={[styles.nextButton, loading && styles.nextButtonDisabled]}
+          style={[styles.nextButton, (loading || permissionGranted) && styles.nextButtonDisabled]}
           onPress={handleEnableNotifications}
-          disabled={loading}
+          disabled={loading || permissionGranted}
         >
-          <Text style={[styles.nextButtonText, loading && styles.nextButtonTextDisabled]}>
-            {loading ? 'Setting up...' : 'Enable notifications'}
+          <Text
+            style={[
+              styles.nextButtonText,
+              (loading || permissionGranted) && styles.nextButtonTextDisabled,
+            ]}
+          >
+            {permissionGranted
+              ? '✓ All set!'
+              : loading
+              ? 'Setting up...'
+              : 'Enable notifications'}
           </Text>
+        </Pressable>
+        <Pressable style={styles.skipLink} onPress={onNext} disabled={loading || permissionGranted}>
+          <Text style={styles.skipLinkText}>Maybe later</Text>
         </Pressable>
       </View>
     </View>
