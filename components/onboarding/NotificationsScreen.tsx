@@ -1,11 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
-import { AppState, AppStateStatus, Image, Platform, Text, View, Pressable, Alert } from 'react-native';
+import { AppState, AppStateStatus, Platform, Text, View, Pressable, Alert } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withTiming,
-  withDelay,
   withSpring,
   Easing,
 } from 'react-native-reanimated';
@@ -88,15 +87,8 @@ export function NotificationsScreen({
     }
   };
 
-  const cardOpacity = useSharedValue(0);
-  const cardTranslateY = useSharedValue(20);
   const controlsOpacity = useSharedValue(0);
   const controlsTranslateY = useSharedValue(16);
-
-  const cardStyle = useAnimatedStyle(() => ({
-    opacity: cardOpacity.value,
-    transform: [{ translateY: cardTranslateY.value }],
-  }));
 
   const controlsStyle = useAnimatedStyle(() => ({
     opacity: controlsOpacity.value,
@@ -105,16 +97,8 @@ export function NotificationsScreen({
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      cardOpacity.value = withTiming(1, { duration: 700, easing: EASE_OUT });
-      cardTranslateY.value = withTiming(0, { duration: 700, easing: EASE_OUT });
-      controlsOpacity.value = withDelay(
-        300,
-        withTiming(1, { duration: 700, easing: EASE_OUT })
-      );
-      controlsTranslateY.value = withDelay(
-        300,
-        withTiming(0, { duration: 700, easing: EASE_OUT })
-      );
+      controlsOpacity.value = withTiming(1, { duration: 700, easing: EASE_OUT });
+      controlsTranslateY.value = withTiming(0, { duration: 700, easing: EASE_OUT });
     }, 50);
     return () => clearTimeout(timer);
   }, []);
@@ -165,15 +149,6 @@ export function NotificationsScreen({
         <Text style={styles.subtitle}>
           {'Get gentle reminders with wisdom throughout your day'}
         </Text>
-
-        <Animated.View style={[styles.notificationCard, cardStyle]}>
-          <Image
-            // eslint-disable-next-line @typescript-eslint/no-require-imports
-            source={require('@/docs/notification-preview.png')}
-            style={{ width: '100%', aspectRatio: 1400 / 800, borderRadius: 8 }}
-            resizeMode="contain"
-          />
-        </Animated.View>
 
         <Animated.View style={controlsStyle}>
           <Text style={styles.frequencySectionLabel}>

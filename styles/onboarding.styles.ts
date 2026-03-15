@@ -290,19 +290,6 @@ export const onboardingStyles = StyleSheet.create({
   },
 
   // ─── Notifications screen ─────────────────────────────────
-  notificationCard: {
-    borderRadius: 20,
-    overflow: 'hidden',
-    marginHorizontal: 4,
-    marginBottom: 28,
-    borderWidth: 1,
-    borderColor: colors.earthSand,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 2,
-  },
   frequencySectionLabel: {
     fontSize: 13,
     fontWeight: '600',
