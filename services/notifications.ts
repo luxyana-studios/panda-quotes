@@ -1,10 +1,28 @@
 import * as Notifications from 'expo-notifications';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Platform } from 'react-native';
+import { Linking, Platform } from 'react-native';
+import * as IntentLauncher from 'expo-intent-launcher';
 
 const STORAGE_KEY_FREQUENCY = 'notification_frequency';
 const STORAGE_KEY_GRANTED = 'notification_granted';
-const CHANNEL_ID = 'panda-quotes';
+// Channel ID bumped to v2 — Android locks importance on first creation,
+// so a new ID is required to apply HIGH importance.
+const CHANNEL_ID = 'panda-quotes-v2';
+
+export type NotificationSetupResult = 'granted' | 'denied' | 'needs_exact_alarm';
+
+export async function openExactAlarmSettings(): Promise<void> {
+  if (Platform.OS !== 'android') return;
+  try {
+    // Opens Alarms & Reminders settings scoped to this specific app.
+    await IntentLauncher.startActivityAsync(
+      'android.settings.REQUEST_SCHEDULE_EXACT_ALARM',
+      { data: 'package:com.luxyanastudios.pandaquotes' }
+    );
+  } catch {
+    await Linking.openSettings();
+  }
+}
 
 const WINDOW_START_HOUR = 8; // 8:00 AM
 const WINDOW_END_HOUR = 21; // 9:00 PM
@@ -35,7 +53,7 @@ async function ensureChannel(): Promise<void> {
   await Notifications.setNotificationChannelAsync(CHANNEL_ID, {
     name: 'Daily Quotes',
     description: 'Gentle daily reminders with panda wisdom',
-    importance: Notifications.AndroidImportance.DEFAULT,
+    importance: Notifications.AndroidImportance.HIGH,
     vibrationPattern: [0, 150, 100, 150],
     lightColor: '#d4a574',
     lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
@@ -83,7 +101,7 @@ async function scheduleNotifications(rawFrequency: number): Promise<void> {
 
 export async function requestPermissionAndSchedule(
   frequency: number
-): Promise<boolean> {
+): Promise<NotificationSetupResult> {
   const { status: existingStatus } = await Notifications.getPermissionsAsync();
   let finalStatus = existingStatus;
 
@@ -92,13 +110,41 @@ export async function requestPermissionAndSchedule(
     finalStatus = status;
   }
 
-  if (finalStatus !== 'granted') return false;
+  if (finalStatus !== 'granted') return 'denied';
 
-  await scheduleNotifications(frequency);
+  // Save preferences first so rescheduleNotificationsIfNeeded can retry
+  // once the user grants the exact alarm permission and reopens the app.
   await AsyncStorage.setItem(STORAGE_KEY_FREQUENCY, String(frequency));
   await AsyncStorage.setItem(STORAGE_KEY_GRANTED, 'true');
 
-  return true;
+  try {
+    await scheduleNotifications(frequency);
+  } catch (e) {
+    // On Android 12+, scheduling exact alarms requires SCHEDULE_EXACT_ALARM,
+    // a special permission the user must grant in Settings › Alarms & Reminders.
+    // This cannot be requested at runtime like a normal permission.
+    if (Platform.OS === 'android') return 'needs_exact_alarm';
+    throw e;
+  }
+
+  return 'granted';
+}
+
+export async function getNotificationSettings(): Promise<{ enabled: boolean; frequency: number }> {
+  const [granted, stored, { status }] = await Promise.all([
+    AsyncStorage.getItem(STORAGE_KEY_GRANTED),
+    AsyncStorage.getItem(STORAGE_KEY_FREQUENCY),
+    Notifications.getPermissionsAsync(),
+  ]);
+  return {
+    enabled: granted === 'true' && status === 'granted',
+    frequency: stored ? parseInt(stored, 10) : 3,
+  };
+}
+
+export async function disableNotifications(): Promise<void> {
+  await Notifications.cancelAllScheduledNotificationsAsync();
+  await AsyncStorage.setItem(STORAGE_KEY_GRANTED, 'false');
 }
 
 // Repeating triggers run indefinitely — rescheduling is only needed

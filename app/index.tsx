@@ -3,13 +3,14 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { StartScreen } from "@/components/StartScreen";
 import { TakeInScreen } from "@/components/TakeInScreen";
 import { ContemplateScreen } from "@/components/ContemplateScreen";
+import { SettingsScreen } from "@/components/SettingsScreen";
 import { OnboardingFlow } from "@/components/onboarding/OnboardingFlow";
 import { useQuoteManager } from "@/hooks/useQuoteManager";
 import { rescheduleNotificationsIfNeeded } from "@/services/notifications";
 
 const ONBOARDING_COMPLETE_KEY = 'onboarding_complete';
 
-type Screen = 'onboarding' | 'start' | 'takeIn' | 'contemplate';
+type Screen = 'onboarding' | 'start' | 'takeIn' | 'contemplate' | 'settings';
 
 export default function Index() {
   const [currentScreen, setCurrentScreen] = useState<Screen | null>(null);
@@ -53,7 +54,9 @@ export default function Index() {
         />
       );
     case 'start':
-      return <StartScreen onReady={handleReady} />;
+      return <StartScreen onReady={handleReady} onSettings={() => setCurrentScreen('settings')} />;
+    case 'settings':
+      return <SettingsScreen onBack={() => setCurrentScreen('start')} />;
     case 'takeIn':
       return (
         <TakeInScreen
