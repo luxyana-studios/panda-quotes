@@ -61,11 +61,33 @@ async function scheduleNotifications(rawFrequency: number): Promise<void> {
   await ensureChannel();
   await Notifications.cancelAllScheduledNotificationsAsync();
 
-  if (Platform.OS === 'android') {
-    // Android: use TIME_INTERVAL repeating triggers — these use inexact repeating
-    // alarms and do not require SCHEDULE_EXACT_ALARM (Android 12+).
-    // Schedule one notification per slot. They fire every 24h/frequency hours,
-    // cycling through teasers.
+  // Try CALENDAR triggers (exact daily times within the window).
+  // On Android 13+, USE_EXACT_ALARM is auto-granted so this works without user interaction.
+  // On Android 12 without SCHEDULE_EXACT_ALARM, this throws — we catch and fall back.
+  // On iOS, CALENDAR triggers always work.
+  try {
+    await Promise.all(
+      computeNotificationTimes(frequency).map(({ hour, minute }, index) =>
+        Notifications.scheduleNotificationAsync({
+          content: {
+            title: 'Panda Quotes',
+            body: NOTIFICATION_TEASERS[index % NOTIFICATION_TEASERS.length],
+            ...(Platform.OS === 'android' && { channelId: CHANNEL_ID }),
+          },
+          trigger: {
+            type: Notifications.SchedulableTriggerInputTypes.CALENDAR,
+            hour,
+            minute,
+            repeats: true,
+          },
+        })
+      )
+    );
+  } catch (e) {
+    if (Platform.OS !== 'android') throw e;
+    // Fallback for Android 12 without exact alarm permission: TIME_INTERVAL repeating.
+    // These fire every N seconds from now — approximate, but guaranteed to work.
+    await Notifications.cancelAllScheduledNotificationsAsync();
     const intervalSeconds = Math.round(86400 / frequency);
     await Promise.all(
       Array.from({ length: frequency }, (_, i) =>
@@ -83,26 +105,7 @@ async function scheduleNotifications(rawFrequency: number): Promise<void> {
         })
       )
     );
-    return;
   }
-
-  // iOS: CALENDAR triggers fire at specific daily times — no special permission needed.
-  await Promise.all(
-    computeNotificationTimes(frequency).map(({ hour, minute }, index) =>
-      Notifications.scheduleNotificationAsync({
-        content: {
-          title: 'Panda Quotes',
-          body: NOTIFICATION_TEASERS[index % NOTIFICATION_TEASERS.length],
-        },
-        trigger: {
-          type: Notifications.SchedulableTriggerInputTypes.CALENDAR,
-          hour,
-          minute,
-          repeats: true,
-        },
-      })
-    )
-  );
 }
 
 export async function requestPermissionAndSchedule(
