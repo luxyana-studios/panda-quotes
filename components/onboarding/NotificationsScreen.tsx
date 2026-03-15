@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { AppState, AppStateStatus, Platform, Text, View, Pressable, Alert } from 'react-native';
+import { AppState, AppStateStatus, Image, Platform, Text, View, Pressable, Alert } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import Animated, {
   useAnimatedStyle,
@@ -26,6 +26,8 @@ export function NotificationsScreen({
   const [frequency, setFrequency] = useState(3);
   const [loading, setLoading] = useState(false);
   const [waitingForAlarmPermission, setWaitingForAlarmPermission] = useState(false);
+  const [permissionGranted, setPermissionGranted] = useState(false);
+  const [retryFailed, setRetryFailed] = useState(false);
   const pendingFrequency = useRef(frequency);
   const startTime = '8:00 AM';
   const endTime = '9:00 PM';
@@ -41,11 +43,14 @@ export function NotificationsScreen({
         const result = await requestPermissionAndSchedule(pendingFrequency.current);
         if (result === 'granted') {
           sub.remove();
-          onNext();
+          setPermissionGranted(true);
+          setTimeout(() => onNext(), 800);
+          return;
         }
-        // result === 'needs_exact_alarm': user came back without granting — stay in waiting UI
+        // User came back without granting — show a retry hint
+        setRetryFailed(true);
       } catch {
-        // stay in waiting UI so the user can try again or skip
+        setRetryFailed(true);
       } finally {
         setLoading(false);
       }
@@ -70,6 +75,7 @@ export function NotificationsScreen({
         // Open the system Alarms & Reminders settings directly — the AppState
         // listener above will complete the setup when the user comes back.
         pendingFrequency.current = frequency;
+        setRetryFailed(false);
         setWaitingForAlarmPermission(true);
         openExactAlarmSettings();
         return;
@@ -161,19 +167,12 @@ export function NotificationsScreen({
         </Text>
 
         <Animated.View style={[styles.notificationCard, cardStyle]}>
-          <Text style={styles.notificationCardLabel}>Preview</Text>
-          <View style={styles.notificationPreview}>
-            <View style={styles.notificationIcon}>
-              <Text style={styles.notificationIconText}>🐼</Text>
-            </View>
-            <View style={styles.notificationTextGroup}>
-              <Text style={styles.notificationPreviewTitle}>Panda Quotes</Text>
-              <Text style={styles.notificationPreviewBody}>
-                {'"The journey of a thousand miles..."'}
-              </Text>
-            </View>
-            <Text style={styles.notificationPreviewTime}>now</Text>
-          </View>
+          <Image
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            source={require('@/docs/notification-preview.png')}
+            style={{ width: '100%', aspectRatio: 1400 / 800, borderRadius: 8 }}
+            resizeMode="contain"
+          />
         </Animated.View>
 
         <Animated.View style={controlsStyle}>
@@ -233,28 +232,32 @@ export function NotificationsScreen({
       <View style={styles.bottomButtonContainer}>
         {waitingForAlarmPermission && Platform.OS === 'android' && (
           <Text style={[styles.summaryText, { marginBottom: 12 }]}>
-            {'Enable "Alarms & Reminders" for this app, then come back here.'}
+            {retryFailed
+              ? 'It looks like the permission wasn\'t enabled. Open Settings and toggle "Alarms & Reminders" for this app.'
+              : 'Enable "Alarms & Reminders" for this app, then come back here.'}
           </Text>
         )}
         <Pressable
-          style={[styles.nextButton, loading && styles.nextButtonDisabled]}
+          style={[styles.nextButton, (loading || permissionGranted) && styles.nextButtonDisabled]}
           onPress={waitingForAlarmPermission ? openExactAlarmSettings : handleEnableNotifications}
-          disabled={loading}
+          disabled={loading || permissionGranted}
         >
           <Text
             style={[
               styles.nextButtonText,
-              loading && styles.nextButtonTextDisabled,
+              (loading || permissionGranted) && styles.nextButtonTextDisabled,
             ]}
           >
-            {loading
-              ? 'Setting up...'
+            {permissionGranted
+              ? '✓ All set!'
+              : loading
+              ? (waitingForAlarmPermission ? 'Checking...' : 'Setting up...')
               : waitingForAlarmPermission
-              ? 'Open Settings'
+              ? (retryFailed ? 'Try again in Settings' : 'Open Settings')
               : 'Enable notifications'}
           </Text>
         </Pressable>
-        <Pressable style={styles.skipLink} onPress={onNext} disabled={loading}>
+        <Pressable style={styles.skipLink} onPress={onNext} disabled={loading || permissionGranted}>
           <Text style={styles.skipLinkText}>
             {waitingForAlarmPermission ? 'Continue without' : 'Maybe later'}
           </Text>
