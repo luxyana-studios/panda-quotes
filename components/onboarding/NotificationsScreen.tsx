@@ -26,7 +26,6 @@ export function NotificationsScreen({
   const [loading, setLoading] = useState(false);
   const [waitingForAlarmPermission, setWaitingForAlarmPermission] = useState(false);
   const [permissionGranted, setPermissionGranted] = useState(false);
-  const [retryFailed, setRetryFailed] = useState(false);
   const pendingFrequency = useRef(frequency);
   const startTime = '8:00 AM';
   const endTime = '9:00 PM';
@@ -39,17 +38,21 @@ export function NotificationsScreen({
       if (state !== 'active') return;
       setLoading(true);
       try {
+        // Brief delay to let Android propagate the permission change.
+        await new Promise(resolve => setTimeout(resolve, 600));
         const result = await requestPermissionAndSchedule(pendingFrequency.current);
+        sub.remove();
         if (result === 'granted') {
-          sub.remove();
           setPermissionGranted(true);
           setTimeout(() => onNext(), 800);
-          return;
+        } else {
+          // Still can't schedule — don't block the user.
+          // rescheduleNotificationsIfNeeded will retry on next app open.
+          onNext();
         }
-        // User came back without granting — show a retry hint
-        setRetryFailed(true);
       } catch {
-        setRetryFailed(true);
+        sub.remove();
+        onNext();
       } finally {
         setLoading(false);
       }
@@ -74,7 +77,6 @@ export function NotificationsScreen({
         // Open the system Alarms & Reminders settings directly — the AppState
         // listener above will complete the setup when the user comes back.
         pendingFrequency.current = frequency;
-        setRetryFailed(false);
         setWaitingForAlarmPermission(true);
         openExactAlarmSettings();
         return;
@@ -207,9 +209,7 @@ export function NotificationsScreen({
       <View style={styles.bottomButtonContainer}>
         {waitingForAlarmPermission && Platform.OS === 'android' && (
           <Text style={[styles.summaryText, { marginBottom: 12 }]}>
-            {retryFailed
-              ? 'It looks like the permission wasn\'t enabled. Open Settings and toggle "Alarms & Reminders" for this app.'
-              : 'Enable "Alarms & Reminders" for this app, then come back here.'}
+            {'Enable "Alarms & Reminders" for this app, then come back here.'}
           </Text>
         )}
         <Pressable
@@ -228,7 +228,7 @@ export function NotificationsScreen({
               : loading
               ? (waitingForAlarmPermission ? 'Checking...' : 'Setting up...')
               : waitingForAlarmPermission
-              ? (retryFailed ? 'Try again in Settings' : 'Open Settings')
+              ? 'Open Settings'
               : 'Enable notifications'}
           </Text>
         </Pressable>

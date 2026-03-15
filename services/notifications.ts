@@ -120,11 +120,19 @@ export async function requestPermissionAndSchedule(
   try {
     await scheduleNotifications(frequency);
   } catch (e) {
-    // On Android 12+, scheduling exact alarms requires SCHEDULE_EXACT_ALARM,
-    // a special permission the user must grant in Settings › Alarms & Reminders.
-    // This cannot be requested at runtime like a normal permission.
-    if (Platform.OS === 'android') return 'needs_exact_alarm';
-    throw e;
+    if (Platform.OS !== 'android') throw e;
+    // On Android 12+, CALENDAR triggers require SCHEDULE_EXACT_ALARM.
+    // Only redirect the user to settings for SecurityExceptions — other errors
+    // are unrelated and would trap the user in an infinite settings loop.
+    const msg = (e instanceof Error ? e.message : String(e)).toLowerCase();
+    const isAlarmPermissionError =
+      msg.includes('exact_alarm') ||
+      msg.includes('schedule_exact') ||
+      msg.includes('securityexception') ||
+      msg.includes('exact alarm');
+    if (isAlarmPermissionError) return 'needs_exact_alarm';
+    // For other errors (channel issues, device quirks), proceed gracefully.
+    // rescheduleNotificationsIfNeeded will retry on next app open.
   }
 
   return 'granted';
