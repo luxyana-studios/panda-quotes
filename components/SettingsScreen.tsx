@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
-import { AppState, AppStateStatus, Platform, Text, View, Pressable } from 'react-native';
+import { useState, useEffect } from 'react';
+import { Text, View, Pressable } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -11,7 +11,6 @@ import { colors } from '@/constants/colors';
 import {
   requestPermissionAndSchedule,
   disableNotifications,
-  openExactAlarmSettings,
   getNotificationSettings,
   MIN_FREQUENCY,
   MAX_FREQUENCY,
@@ -28,8 +27,6 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
   const [enabled, setEnabled] = useState(false);
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
-  const [waitingForAlarmPermission, setWaitingForAlarmPermission] = useState(false);
-  const pendingFrequency = useRef(frequency);
 
   const cardOpacity = useSharedValue(0);
   const cardTranslateY = useSharedValue(20);
@@ -52,30 +49,6 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Retry scheduling automatically when the user returns from Alarms & Reminders settings.
-  useEffect(() => {
-    if (!waitingForAlarmPermission) return;
-    const sub = AppState.addEventListener('change', async (state: AppStateStatus) => {
-      if (state !== 'active') return;
-      setLoading(true);
-      try {
-        const result = await requestPermissionAndSchedule(pendingFrequency.current);
-        if (result === 'granted') {
-          sub.remove();
-          setWaitingForAlarmPermission(false);
-          setEnabled(true);
-          setSaved(true);
-          setTimeout(() => setSaved(false), 2000);
-        }
-      } catch {
-        // stay in waiting state
-      } finally {
-        setLoading(false);
-      }
-    });
-    return () => sub.remove();
-  }, [waitingForAlarmPermission]);
-
   const handleSave = async () => {
     if (loading) return;
     setLoading(true);
@@ -84,10 +57,6 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
       const result = await requestPermissionAndSchedule(frequency);
       if (result === 'denied') {
         setEnabled(false);
-      } else if (result === 'needs_exact_alarm') {
-        pendingFrequency.current = frequency;
-        setWaitingForAlarmPermission(true);
-        openExactAlarmSettings();
       } else {
         setEnabled(true);
         setSaved(true);
@@ -197,13 +166,6 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
         </View>
       </Animated.View>
 
-      {/* Waiting for alarm permission */}
-      {waitingForAlarmPermission && Platform.OS === 'android' && (
-        <Text style={{ color: 'rgba(255,255,255,0.85)', textAlign: 'center', fontSize: 14, lineHeight: 21, marginTop: 20 }}>
-          {'Enable "Alarms & Reminders" for this app, then come back here.'}
-        </Text>
-      )}
-
       <View style={{ flex: 1 }} />
 
       {/* Bottom actions */}
@@ -214,7 +176,7 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
           </Text>
         )}
         <Pressable
-          onPress={waitingForAlarmPermission ? openExactAlarmSettings : handleSave}
+          onPress={handleSave}
           disabled={loading}
           style={{
             backgroundColor: '#fff',
@@ -230,15 +192,11 @@ export function SettingsScreen({ onBack }: SettingsScreenProps) {
           }}
         >
           <Text style={{ color: colors.brandDark, fontSize: 17, fontWeight: '700', letterSpacing: 0.3 }}>
-            {loading
-              ? 'Saving...'
-              : waitingForAlarmPermission
-              ? 'Open Settings'
-              : 'Save changes'}
+            {loading ? 'Saving...' : 'Save changes'}
           </Text>
         </Pressable>
 
-        {enabled && !waitingForAlarmPermission && (
+        {enabled && (
           <Pressable onPress={handleDisable} disabled={loading} style={{ paddingVertical: 14, alignItems: 'center' }}>
             <Text style={{ color: 'rgba(255,255,255,0.55)', fontSize: 14 }}>
               Turn off notifications

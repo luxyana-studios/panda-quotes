@@ -1,28 +1,12 @@
 import * as Notifications from 'expo-notifications';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Linking, Platform } from 'react-native';
-import * as IntentLauncher from 'expo-intent-launcher';
+import { Platform } from 'react-native';
 
 const STORAGE_KEY_FREQUENCY = 'notification_frequency';
 const STORAGE_KEY_GRANTED = 'notification_granted';
-// Channel ID bumped to v2 — Android locks importance on first creation,
-// so a new ID is required to apply HIGH importance.
 const CHANNEL_ID = 'panda-quotes-v2';
 
-export type NotificationSetupResult = 'granted' | 'denied' | 'needs_exact_alarm';
-
-export async function openExactAlarmSettings(): Promise<void> {
-  if (Platform.OS !== 'android') return;
-  try {
-    // Opens Alarms & Reminders settings scoped to this specific app.
-    await IntentLauncher.startActivityAsync(
-      'android.settings.REQUEST_SCHEDULE_EXACT_ALARM',
-      { data: 'package:com.luxyanastudios.pandaquotes' }
-    );
-  } catch {
-    await Linking.openSettings();
-  }
-}
+export type NotificationSetupResult = 'granted' | 'denied';
 
 const WINDOW_START_HOUR = 8; // 8:00 AM
 const WINDOW_END_HOUR = 21; // 9:00 PM
@@ -65,9 +49,6 @@ async function ensureChannel(): Promise<void> {
 function computeNotificationTimes(
   frequency: number
 ): { hour: number; minute: number }[] {
-  // Dividing by (frequency + 1) guarantees the last slot is always one
-  // interval before the window end, so no notification ever exceeds
-  // WINDOW_END_HOUR (e.g. 5 daily → last at 6:50 PM, well under 9 PM).
   const interval = WINDOW_MINUTES / (frequency + 1);
   return Array.from({ length: frequency }, (_, i) => {
     const totalMinutes = WINDOW_START_HOUR * 60 + Math.round(interval * (i + 1));
@@ -80,13 +61,38 @@ async function scheduleNotifications(rawFrequency: number): Promise<void> {
   await ensureChannel();
   await Notifications.cancelAllScheduledNotificationsAsync();
 
+  if (Platform.OS === 'android') {
+    // Android: use TIME_INTERVAL repeating triggers — these use inexact repeating
+    // alarms and do not require SCHEDULE_EXACT_ALARM (Android 12+).
+    // Schedule one notification per slot. They fire every 24h/frequency hours,
+    // cycling through teasers.
+    const intervalSeconds = Math.round(86400 / frequency);
+    await Promise.all(
+      Array.from({ length: frequency }, (_, i) =>
+        Notifications.scheduleNotificationAsync({
+          content: {
+            title: 'Panda Quotes',
+            body: NOTIFICATION_TEASERS[i % NOTIFICATION_TEASERS.length],
+            ...(Platform.OS === 'android' && { channelId: CHANNEL_ID }),
+          },
+          trigger: {
+            type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+            seconds: intervalSeconds,
+            repeats: true,
+          },
+        })
+      )
+    );
+    return;
+  }
+
+  // iOS: CALENDAR triggers fire at specific daily times — no special permission needed.
   await Promise.all(
     computeNotificationTimes(frequency).map(({ hour, minute }, index) =>
       Notifications.scheduleNotificationAsync({
         content: {
           title: 'Panda Quotes',
           body: NOTIFICATION_TEASERS[index % NOTIFICATION_TEASERS.length],
-          ...(Platform.OS === 'android' && { channelId: CHANNEL_ID }),
         },
         trigger: {
           type: Notifications.SchedulableTriggerInputTypes.CALENDAR,
@@ -112,28 +118,9 @@ export async function requestPermissionAndSchedule(
 
   if (finalStatus !== 'granted') return 'denied';
 
-  // Save preferences first so rescheduleNotificationsIfNeeded can retry
-  // once the user grants the exact alarm permission and reopens the app.
   await AsyncStorage.setItem(STORAGE_KEY_FREQUENCY, String(frequency));
   await AsyncStorage.setItem(STORAGE_KEY_GRANTED, 'true');
-
-  try {
-    await scheduleNotifications(frequency);
-  } catch (e) {
-    if (Platform.OS !== 'android') throw e;
-    // On Android 12+, CALENDAR triggers require SCHEDULE_EXACT_ALARM.
-    // Only redirect the user to settings for SecurityExceptions — other errors
-    // are unrelated and would trap the user in an infinite settings loop.
-    const msg = (e instanceof Error ? e.message : String(e)).toLowerCase();
-    const isAlarmPermissionError =
-      msg.includes('exact_alarm') ||
-      msg.includes('schedule_exact') ||
-      msg.includes('securityexception') ||
-      msg.includes('exact alarm');
-    if (isAlarmPermissionError) return 'needs_exact_alarm';
-    // For other errors (channel issues, device quirks), proceed gracefully.
-    // rescheduleNotificationsIfNeeded will retry on next app open.
-  }
+  await scheduleNotifications(frequency);
 
   return 'granted';
 }
@@ -155,14 +142,20 @@ export async function disableNotifications(): Promise<void> {
   await AsyncStorage.setItem(STORAGE_KEY_GRANTED, 'false');
 }
 
-// Repeating triggers run indefinitely — rescheduling is only needed
-// if the user changes their frequency setting.
 export async function rescheduleNotificationsIfNeeded(): Promise<void> {
   const granted = await AsyncStorage.getItem(STORAGE_KEY_GRANTED);
   if (granted !== 'true') return;
 
   const { status } = await Notifications.getPermissionsAsync();
   if (status !== 'granted') return;
+
+  // On Android, TIME_INTERVAL triggers persist until explicitly cancelled.
+  // Don't reschedule on every app open — that resets the timer from now.
+  // Only reschedule if no notifications are scheduled (e.g. after reinstall).
+  if (Platform.OS === 'android') {
+    const scheduled = await Notifications.getAllScheduledNotificationsAsync();
+    if (scheduled.length > 0) return;
+  }
 
   const stored = await AsyncStorage.getItem(STORAGE_KEY_FREQUENCY);
   const frequency = stored ? parseInt(stored, 10) : 3;

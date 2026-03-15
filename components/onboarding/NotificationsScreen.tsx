@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
-import { AppState, AppStateStatus, Platform, Text, View, Pressable, Alert } from 'react-native';
+import { useState, useEffect } from 'react';
+import { Text, View, Pressable, Alert } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import Animated, {
   useAnimatedStyle,
@@ -9,7 +9,7 @@ import Animated, {
   Easing,
 } from 'react-native-reanimated';
 import { onboardingStyles as styles } from '@/styles/onboarding.styles';
-import { requestPermissionAndSchedule, openExactAlarmSettings, MIN_FREQUENCY, MAX_FREQUENCY } from '@/services/notifications';
+import { requestPermissionAndSchedule, MIN_FREQUENCY, MAX_FREQUENCY } from '@/services/notifications';
 
 interface NotificationsScreenProps {
   onNext: () => void;
@@ -24,41 +24,9 @@ export function NotificationsScreen({
 }: NotificationsScreenProps) {
   const [frequency, setFrequency] = useState(3);
   const [loading, setLoading] = useState(false);
-  const [waitingForAlarmPermission, setWaitingForAlarmPermission] = useState(false);
   const [permissionGranted, setPermissionGranted] = useState(false);
-  const pendingFrequency = useRef(frequency);
   const startTime = '8:00 AM';
   const endTime = '9:00 PM';
-
-  // When Android sends the user to Alarms & Reminders settings, listen for
-  // the app returning to foreground and automatically retry scheduling.
-  useEffect(() => {
-    if (!waitingForAlarmPermission) return;
-    const sub = AppState.addEventListener('change', async (state: AppStateStatus) => {
-      if (state !== 'active') return;
-      setLoading(true);
-      try {
-        // Brief delay to let Android propagate the permission change.
-        await new Promise(resolve => setTimeout(resolve, 600));
-        const result = await requestPermissionAndSchedule(pendingFrequency.current);
-        sub.remove();
-        if (result === 'granted') {
-          setPermissionGranted(true);
-          setTimeout(() => onNext(), 800);
-        } else {
-          // Still can't schedule — don't block the user.
-          // rescheduleNotificationsIfNeeded will retry on next app open.
-          onNext();
-        }
-      } catch {
-        sub.remove();
-        onNext();
-      } finally {
-        setLoading(false);
-      }
-    });
-    return () => sub.remove();
-  }, [waitingForAlarmPermission, onNext]);
 
   const handleEnableNotifications = async () => {
     if (loading) return;
@@ -73,15 +41,8 @@ export function NotificationsScreen({
         );
         return;
       }
-      if (result === 'needs_exact_alarm') {
-        // Open the system Alarms & Reminders settings directly — the AppState
-        // listener above will complete the setup when the user comes back.
-        pendingFrequency.current = frequency;
-        setWaitingForAlarmPermission(true);
-        openExactAlarmSettings();
-        return;
-      }
-      onNext();
+      setPermissionGranted(true);
+      setTimeout(() => onNext(), 800);
     } catch {
       onNext();
     } finally {
@@ -207,14 +168,9 @@ export function NotificationsScreen({
       </View>
 
       <View style={styles.bottomButtonContainer}>
-        {waitingForAlarmPermission && Platform.OS === 'android' && (
-          <Text style={[styles.summaryText, { marginBottom: 12 }]}>
-            {'Enable "Alarms & Reminders" for this app, then come back here.'}
-          </Text>
-        )}
         <Pressable
           style={[styles.nextButton, (loading || permissionGranted) && styles.nextButtonDisabled]}
-          onPress={waitingForAlarmPermission ? openExactAlarmSettings : handleEnableNotifications}
+          onPress={handleEnableNotifications}
           disabled={loading || permissionGranted}
         >
           <Text
@@ -226,16 +182,12 @@ export function NotificationsScreen({
             {permissionGranted
               ? '✓ All set!'
               : loading
-              ? (waitingForAlarmPermission ? 'Checking...' : 'Setting up...')
-              : waitingForAlarmPermission
-              ? 'Open Settings'
+              ? 'Setting up...'
               : 'Enable notifications'}
           </Text>
         </Pressable>
         <Pressable style={styles.skipLink} onPress={onNext} disabled={loading || permissionGranted}>
-          <Text style={styles.skipLinkText}>
-            {waitingForAlarmPermission ? 'Continue without' : 'Maybe later'}
-          </Text>
+          <Text style={styles.skipLinkText}>Maybe later</Text>
         </Pressable>
       </View>
     </View>
