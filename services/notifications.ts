@@ -56,6 +56,13 @@ function computeNotificationTimes(
   });
 }
 
+function secondsUntilNextOccurrence(hour: number, minute: number): number {
+  const now = new Date();
+  const target = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hour, minute, 0, 0);
+  if (target <= now) target.setDate(target.getDate() + 1);
+  return Math.round((target.getTime() - now.getTime()) / 1000);
+}
+
 async function scheduleNotifications(rawFrequency: number): Promise<void> {
   const frequency = Math.min(Math.max(rawFrequency, MIN_FREQUENCY), MAX_FREQUENCY);
   await ensureChannel();
@@ -85,12 +92,12 @@ async function scheduleNotifications(rawFrequency: number): Promise<void> {
     );
   } catch (e) {
     if (Platform.OS !== 'android') throw e;
-    // Fallback for Android 12 without exact alarm permission: TIME_INTERVAL repeating.
-    // These fire every N seconds from now — approximate, but guaranteed to work.
+    // Fallback for Android 12 without exact alarm permission: one-shot TIME_INTERVAL
+    // triggers scheduled at the next occurrence of each computed window time.
     await Notifications.cancelAllScheduledNotificationsAsync();
-    const intervalSeconds = Math.round(86400 / frequency);
+    const times = computeNotificationTimes(frequency);
     await Promise.all(
-      Array.from({ length: frequency }, (_, i) =>
+      times.map(({ hour, minute }, i) =>
         Notifications.scheduleNotificationAsync({
           content: {
             title: 'Panda Quotes',
@@ -99,8 +106,8 @@ async function scheduleNotifications(rawFrequency: number): Promise<void> {
           },
           trigger: {
             type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
-            seconds: intervalSeconds,
-            repeats: true,
+            seconds: secondsUntilNextOccurrence(hour, minute),
+            repeats: false,
           },
         })
       )
@@ -152,15 +159,14 @@ export async function rescheduleNotificationsIfNeeded(): Promise<void> {
   const { status } = await Notifications.getPermissionsAsync();
   if (status !== 'granted') return;
 
-  // On Android, TIME_INTERVAL triggers persist until explicitly cancelled.
-  // Don't reschedule on every app open — that resets the timer from now.
-  // Only reschedule if no notifications are scheduled (e.g. after reinstall).
-  if (Platform.OS === 'android') {
-    const scheduled = await Notifications.getAllScheduledNotificationsAsync();
-    if (scheduled.length > 0) return;
-  }
-
   const stored = await AsyncStorage.getItem(STORAGE_KEY_FREQUENCY);
   const frequency = stored ? parseInt(stored, 10) : 3;
+
+  // CALENDAR repeating triggers stay in the list permanently (count stays at frequency).
+  // TIME_INTERVAL one-shot triggers disappear after firing (count drops below frequency).
+  // In both cases: only reschedule when fewer notifications are pending than expected.
+  const scheduled = await Notifications.getAllScheduledNotificationsAsync();
+  if (scheduled.length >= frequency) return;
+
   await scheduleNotifications(frequency);
 }

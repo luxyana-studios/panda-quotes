@@ -19,7 +19,9 @@
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "package": "com.luxyanastudios.pandaquotes",
-      "permissions": []
+      "permissions": [
+        "android.permission.USE_EXACT_ALARM"
+      ]
     },
     "web": {
       "output": "static",
