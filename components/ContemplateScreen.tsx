@@ -112,7 +112,7 @@ export function ContemplateScreen({
               disabled={!showMoveOnButton}
             >
               <Text style={styles.primaryButtonText}>
-                {"I'm ready to move on now"}
+                Close
               </Text>
             </Pressable>
           </Animated.View>
