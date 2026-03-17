@@ -13,6 +13,7 @@ const WINDOW_END_HOUR = 21; // 9:00 PM
 const WINDOW_MINUTES = (WINDOW_END_HOUR - WINDOW_START_HOUR) * 60;
 export const MIN_FREQUENCY = 1;
 export const MAX_FREQUENCY = 5;
+const DAYS_AHEAD = 7; // schedule this many days in advance
 
 const NOTIFICATION_TEASERS = [
   "I've been sitting with a thought for you 🐼",
@@ -63,18 +64,35 @@ function secondsUntilNextOccurrence(hour: number, minute: number): number {
   return Math.round((target.getTime() - now.getTime()) / 1000);
 }
 
+// Returns one Date per notification slot for the next DAYS_AHEAD days,
+// skipping any slots that have already passed today.
+function getUpcomingDates(frequency: number): Date[] {
+  const times = computeNotificationTimes(frequency);
+  const now = new Date();
+  const dates: Date[] = [];
+  for (let day = 0; day < DAYS_AHEAD; day++) {
+    for (const { hour, minute } of times) {
+      const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + day, hour, minute, 0, 0);
+      if (d > now) dates.push(d);
+    }
+  }
+  return dates;
+}
+
 async function scheduleNotifications(rawFrequency: number): Promise<void> {
   const frequency = Math.min(Math.max(rawFrequency, MIN_FREQUENCY), MAX_FREQUENCY);
   await ensureChannel();
   await Notifications.cancelAllScheduledNotificationsAsync();
 
-  // Try CALENDAR triggers (exact daily times within the window).
-  // On Android 13+, USE_EXACT_ALARM is auto-granted so this works without user interaction.
-  // On Android 12 without SCHEDULE_EXACT_ALARM, this throws — we catch and fall back.
-  // On iOS, CALENDAR triggers always work.
+  // Schedule one-shot DATE triggers for each slot over the next DAYS_AHEAD days.
+  // Pre-registering all alarms upfront means they fire even if the app process is
+  // killed by battery optimization — no repeat-chain to break.
+  // On Android 13+, USE_EXACT_ALARM is auto-granted. On Android 12, this throws a
+  // SecurityException and we fall back to TIME_INTERVAL one-shot triggers.
   try {
+    const dates = getUpcomingDates(frequency);
     await Promise.all(
-      computeNotificationTimes(frequency).map(({ hour, minute }, index) =>
+      dates.map((date, index) =>
         Notifications.scheduleNotificationAsync({
           content: {
             title: 'Panda Quotes',
@@ -82,10 +100,8 @@ async function scheduleNotifications(rawFrequency: number): Promise<void> {
             ...(Platform.OS === 'android' && { channelId: CHANNEL_ID }),
           },
           trigger: {
-            type: Notifications.SchedulableTriggerInputTypes.CALENDAR,
-            hour,
-            minute,
-            repeats: true,
+            type: Notifications.SchedulableTriggerInputTypes.DATE,
+            date,
           },
         })
       )
@@ -162,11 +178,10 @@ export async function rescheduleNotificationsIfNeeded(): Promise<void> {
   const stored = await AsyncStorage.getItem(STORAGE_KEY_FREQUENCY);
   const frequency = stored ? parseInt(stored, 10) : 3;
 
-  // CALENDAR repeating triggers stay in the list permanently (count stays at frequency).
-  // TIME_INTERVAL one-shot triggers disappear after firing (count drops below frequency).
-  // In both cases: only reschedule when fewer notifications are pending than expected.
+  // DATE one-shot triggers disappear after firing, so the count decrements each day.
+  // Reschedule when fewer than 3 days' worth remain, ensuring a fresh 7-day window.
   const scheduled = await Notifications.getAllScheduledNotificationsAsync();
-  if (scheduled.length >= frequency) return;
+  if (scheduled.length >= frequency * 3) return;
 
   await scheduleNotifications(frequency);
 }
