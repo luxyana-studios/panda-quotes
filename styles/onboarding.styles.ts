@@ -290,66 +290,6 @@ export const onboardingStyles = StyleSheet.create({
   },
 
   // ─── Notifications screen ─────────────────────────────────
-  notificationCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: 20,
-    padding: 18,
-    marginHorizontal: 4,
-    marginBottom: 28,
-    borderWidth: 1,
-    borderColor: colors.earthSand,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  notificationCardLabel: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: colors.brandPrimary,
-    letterSpacing: 0.8,
-    textTransform: 'uppercase',
-    marginBottom: 12,
-  },
-  notificationPreview: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 14,
-    backgroundColor: colors.brandLight,
-    borderRadius: 14,
-    padding: 14,
-  },
-  notificationIcon: {
-    width: 42,
-    height: 42,
-    borderRadius: 12,
-    backgroundColor: colors.brandAccent,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  notificationIconText: {
-    fontSize: 20,
-  },
-  notificationTextGroup: {
-    flex: 1,
-  },
-  notificationPreviewTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: colors.brandDark,
-  },
-  notificationPreviewBody: {
-    fontSize: 13,
-    color: colors.brandPrimary,
-    marginTop: 2,
-    fontStyle: 'italic',
-  },
-  notificationPreviewTime: {
-    fontSize: 11,
-    color: colors.brandMuted,
-    fontWeight: '500',
-  },
   frequencySectionLabel: {
     fontSize: 13,
     fontWeight: '600',
@@ -460,6 +400,15 @@ export const onboardingStyles = StyleSheet.create({
   },
   nextButtonTextDisabled: {
     color: colors.brandPrimary,
+  },
+  skipLink: {
+    alignItems: 'center',
+    paddingVertical: 12,
+  },
+  skipLinkText: {
+    fontSize: 14,
+    color: colors.brandPrimary,
+    fontWeight: '500',
   },
 
   // ─── Welcome back screen (Screen 5) ───────────────────────

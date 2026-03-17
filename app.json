@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "panda-quotes",
+    "name": "Panda Quotes",
     "slug": "panda-quotes",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -18,7 +18,10 @@
     "android": {
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.luxyanastudios.pandaquotes"
+      "package": "com.luxyanastudios.pandaquotes",
+      "permissions": [
+        "android.permission.USE_EXACT_ALARM"
+      ]
     },
     "web": {
       "output": "static",
