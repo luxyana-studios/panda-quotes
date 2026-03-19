@@ -46,7 +46,9 @@
       [
         "expo-notifications",
         {
-          "sounds": []
+          "sounds": [],
+          "androidMode": "default",
+          "androidCollapsedTitle": "Panda Quotes"
         }
       ],
       "expo-video",

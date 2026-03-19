@@ -1,9 +1,6 @@
 import * as Notifications from "expo-notifications";
-import { RED_PANDA_QUOTES } from "@/constants/quotes";
-import { mmkv } from "@/core/storage/mmkv";
-
-const STORAGE_KEY_FREQUENCY = "notification_frequency";
-const STORAGE_KEY_GRANTED = "notification_granted";
+import { Platform } from "react-native";
+import { getQuoteForCategories } from "@/constants/quotes";
 
 const WINDOW_START_HOUR = 8; // 8:00 AM
 const WINDOW_END_HOUR = 21; // 9:00 PM
@@ -19,8 +16,15 @@ Notifications.setNotificationHandler({
   }),
 });
 
-function getRandomQuote(): string {
-  return RED_PANDA_QUOTES[Math.floor(Math.random() * RED_PANDA_QUOTES.length)];
+export async function setupAndroidChannel(): Promise<void> {
+  if (Platform.OS !== "android") return;
+  await Notifications.setNotificationChannelAsync("daily-wisdom", {
+    name: "Daily Wisdom",
+    importance: Notifications.AndroidImportance.DEFAULT,
+    vibrationPattern: [0, 250, 250, 250],
+    lightColor: "#FF231F7C",
+    sound: null,
+  });
 }
 
 function computeNotificationTimes(
@@ -41,7 +45,10 @@ function computeNotificationTimes(
   return times;
 }
 
-async function scheduleNotifications(frequency: number): Promise<void> {
+async function scheduleNotifications(
+  frequency: number,
+  categories: string[],
+): Promise<void> {
   await Notifications.cancelAllScheduledNotificationsAsync();
 
   const times = computeNotificationTimes(frequency);
@@ -50,10 +57,11 @@ async function scheduleNotifications(frequency: number): Promise<void> {
     await Notifications.scheduleNotificationAsync({
       content: {
         title: "Panda Quotes 🐼",
-        body: getRandomQuote(),
+        body: getQuoteForCategories(categories),
       },
       trigger: {
         type: Notifications.SchedulableTriggerInputTypes.DAILY,
+        channelId: Platform.OS === "android" ? "daily-wisdom" : undefined,
         hour,
         minute,
       },
@@ -61,8 +69,11 @@ async function scheduleNotifications(frequency: number): Promise<void> {
   }
 }
 
+// Returns true if permission was granted and notifications were scheduled.
+// Caller is responsible for persisting the result to the settings store.
 export async function requestPermissionAndSchedule(
   frequency: number,
+  categories: string[],
 ): Promise<boolean> {
   const { status: existingStatus } = await Notifications.getPermissionsAsync();
   let finalStatus = existingStatus;
@@ -76,22 +87,22 @@ export async function requestPermissionAndSchedule(
     return false;
   }
 
-  await scheduleNotifications(frequency);
-  mmkv.set(STORAGE_KEY_FREQUENCY, String(frequency));
-  mmkv.set(STORAGE_KEY_GRANTED, "true");
-
+  await scheduleNotifications(frequency, categories);
   return true;
 }
 
-export async function rescheduleNotificationsIfNeeded(): Promise<void> {
-  const granted = mmkv.getString(STORAGE_KEY_GRANTED);
-  if (granted !== "true") return;
+// Caller reads settings from the store and passes them in.
+export async function rescheduleNotificationsIfNeeded(
+  notificationEnabled: boolean,
+  notificationFrequency: number,
+  selectedCategories: string[],
+): Promise<void> {
+  await setupAndroidChannel();
+
+  if (!notificationEnabled) return;
 
   const { status } = await Notifications.getPermissionsAsync();
   if (status !== "granted") return;
 
-  const stored = mmkv.getString(STORAGE_KEY_FREQUENCY);
-  const frequency = stored ? parseInt(stored, 10) : 3;
-
-  await scheduleNotifications(frequency);
+  await scheduleNotifications(notificationFrequency, selectedCategories);
 }

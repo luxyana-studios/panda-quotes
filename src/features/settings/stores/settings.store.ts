@@ -6,11 +6,18 @@ import { zustandMMKVStorage } from "@/core/storage/mmkv";
 
 type ThemeMode = "system" | "light" | "dark";
 
-interface SettingsState {
+export interface SettingsState {
   themeMode: ThemeMode;
   language: string;
+  onboardingCompleted: boolean;
+  selectedCategories: string[];
+  notificationEnabled: boolean;
+  notificationFrequency: number;
   setThemeMode: (mode: ThemeMode) => void;
   setLanguage: (language: string) => void;
+  setOnboardingCompleted: (v: boolean) => void;
+  setSelectedCategories: (cats: string[]) => void;
+  setNotificationPrefs: (enabled: boolean, frequency: number) => void;
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -18,6 +25,10 @@ export const useSettingsStore = create<SettingsState>()(
     (set) => ({
       themeMode: "system",
       language: i18n.language,
+      onboardingCompleted: false,
+      selectedCategories: [],
+      notificationEnabled: false,
+      notificationFrequency: 3,
 
       setThemeMode: (mode) => {
         if (mode === "system") {
@@ -33,6 +44,13 @@ export const useSettingsStore = create<SettingsState>()(
         i18n.changeLanguage(language);
         set({ language });
       },
+
+      setOnboardingCompleted: (v) => set({ onboardingCompleted: v }),
+
+      setSelectedCategories: (cats) => set({ selectedCategories: cats }),
+
+      setNotificationPrefs: (enabled, frequency) =>
+        set({ notificationEnabled: enabled, notificationFrequency: frequency }),
     }),
     {
       name: "settings-storage",

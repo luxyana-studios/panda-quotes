@@ -3,17 +3,27 @@ import { ContemplateScreen } from "@/components/ContemplateScreen";
 import { OnboardingFlow } from "@/components/onboarding/OnboardingFlow";
 import { StartScreen } from "@/components/StartScreen";
 import { TakeInScreen } from "@/components/TakeInScreen";
+import { useSettingsStore } from "@/features/settings/stores/settings.store";
 import { useQuoteManager } from "@/hooks/useQuoteManager";
 import { rescheduleNotificationsIfNeeded } from "@/services/notifications";
 
 type Screen = "onboarding" | "start" | "takeIn" | "contemplate";
 
 export default function Index() {
-  const [currentScreen, setCurrentScreen] = useState<Screen>("onboarding");
+  const { onboardingCompleted } = useSettingsStore();
+  const [currentScreen, setCurrentScreen] = useState<Screen>(
+    onboardingCompleted ? "start" : "onboarding",
+  );
   const { currentQuote, getNextQuote } = useQuoteManager();
 
   useEffect(() => {
-    rescheduleNotificationsIfNeeded();
+    const { notificationEnabled, notificationFrequency, selectedCategories } =
+      useSettingsStore.getState();
+    rescheduleNotificationsIfNeeded(
+      notificationEnabled,
+      notificationFrequency,
+      selectedCategories,
+    );
   }, []);
 
   const handleReady = () => {
