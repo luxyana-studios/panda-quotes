@@ -1,0 +1,14 @@
+min_version: 2.0.0
+rc: "$(git rev-parse --show-toplevel)/.lefthookrc"
+
+pre-commit:
+  parallel: true
+  commands:
+    lint:
+      glob: "*.{ts,tsx,js,jsx,json}"
+      run: npx biome check --no-errors-on-unmatched {staged_files}
+    format:
+      glob: "*.{ts,tsx,js,jsx,json}"
+      run: npx biome format --no-errors-on-unmatched {staged_files}
+    typecheck:
+      run: npx tsc --noEmit
