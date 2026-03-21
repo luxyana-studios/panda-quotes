@@ -215,12 +215,6 @@ export function NotificationsScreen({
               end: endTime,
             })}
           </Text>
-
-          <Pressable style={skipButtonStyle} onPress={onSkip}>
-            <Text style={skipButtonTextStyle}>
-              {t("onboarding.notifications.later")}
-            </Text>
-          </Pressable>
         </Animated.View>
       </View>
 
@@ -241,6 +235,11 @@ export function NotificationsScreen({
               : t("onboarding.notifications.enable")}
           </Text>
         </Pressable>
+        <Pressable style={skipButtonStyle} onPress={onSkip}>
+          <Text style={skipButtonTextStyle}>
+            {t("onboarding.notifications.later")}
+          </Text>
+        </Pressable>
       </View>
     </View>
   );
@@ -248,7 +247,7 @@ export function NotificationsScreen({
 
 const skipButtonStyle: import("react-native").ViewStyle = {
   alignSelf: "center",
-  marginTop: 20,
+  marginTop: 12,
   paddingVertical: 8,
   paddingHorizontal: 16,
 };
