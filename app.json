@@ -18,7 +18,12 @@
     "android": {
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.luxyanastudios.pandaquotes"
+      "package": "com.luxyanastudios.pandaquotes",
+      "permissions": [
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.SCHEDULE_EXACT_ALARM",
+        "android.permission.RECEIVE_BOOT_COMPLETED"
+      ]
     },
     "web": {
       "output": "static",
@@ -46,7 +51,9 @@
       [
         "expo-notifications",
         {
-          "sounds": []
+          "sounds": [],
+          "androidMode": "default",
+          "androidCollapsedTitle": "Panda Quotes"
         }
       ],
       "expo-video",

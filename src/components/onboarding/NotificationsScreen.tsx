@@ -8,12 +8,14 @@ import Animated, {
   withSpring,
   withTiming,
 } from "react-native-reanimated";
+import { useSettingsStore } from "@/features/settings/stores/settings.store";
 import { requestPermissionAndSchedule } from "@/services/notifications";
 import { onboardingStyles as styles } from "@/styles/onboarding.styles";
 
 interface NotificationsScreenProps {
   onNext: () => void;
   onBack: () => void;
+  onSkip: () => void;
 }
 
 const EASE_OUT = Easing.bezier(0.25, 0.46, 0.45, 0.94);
@@ -21,11 +23,14 @@ const EASE_OUT = Easing.bezier(0.25, 0.46, 0.45, 0.94);
 export function NotificationsScreen({
   onNext,
   onBack,
+  onSkip,
 }: NotificationsScreenProps) {
   const [frequency, setFrequency] = useState(3);
   const [loading, setLoading] = useState(false);
   const startTime = "8:00 AM";
   const endTime = "9:00 PM";
+
+  const { setNotificationPrefs } = useSettingsStore();
 
   const handleEnableNotifications = async () => {
     if (loading) return;
@@ -40,6 +45,7 @@ export function NotificationsScreen({
         );
         return;
       }
+      setNotificationPrefs(true, frequency);
       onNext();
     } catch {
       onNext();
@@ -63,6 +69,7 @@ export function NotificationsScreen({
     transform: [{ translateY: controlsTranslateY.value }],
   }));
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Reanimated shared values are stable refs
   useEffect(() => {
     const timer = setTimeout(() => {
       cardOpacity.value = withTiming(1, { duration: 700, easing: EASE_OUT });
@@ -208,6 +215,9 @@ export function NotificationsScreen({
           >
             {loading ? "Setting up..." : "Enable notifications"}
           </Text>
+        </Pressable>
+        <Pressable style={styles.headerSkipButton} onPress={onSkip}>
+          <Text style={styles.headerSkipText}>Maybe later</Text>
         </Pressable>
       </View>
     </View>

@@ -1,6 +1,20 @@
 import { Image } from "expo-image";
 import { useEffect, useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
+
+const CATEGORIES = [
+  "Wisdom",
+  "Patience",
+  "Joy",
+  "Nature",
+  "Humor",
+  "Courage",
+  "Peace",
+  "Growth",
+  "Resilience",
+  "Self-discovery",
+];
+
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -28,6 +42,7 @@ export function NameScreen({ onNext, onBack }: NameScreenProps) {
     transform: [{ translateY: contentTranslateY.value }],
   }));
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Reanimated shared values are stable refs
   useEffect(() => {
     const timer = setTimeout(() => {
       contentOpacity.value = withTiming(1, { duration: 700, easing: EASE_OUT });
@@ -68,6 +83,14 @@ export function NameScreen({ onNext, onBack }: NameScreenProps) {
         <Text style={styles.subtitle}>
           {"I'd love to get to know you better!"}
         </Text>
+
+        <View style={styles.chipGrid}>
+          {CATEGORIES.map((cat) => (
+            <View key={cat} style={styles.chip}>
+              <Text style={styles.chipText}>{cat}</Text>
+            </View>
+          ))}
+        </View>
 
         <View style={styles.textInputWrapper}>
           <Text style={styles.textInputLabel}>Your Name</Text>

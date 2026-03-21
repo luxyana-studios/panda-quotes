@@ -1,4 +1,4 @@
-export const RED_PANDA_QUOTES = [
+export const RED_PANDA_QUOTES: string[] = [
   "Bamboo may bend, but wisdom remains rooted in the earth.",
   "The tree that offers the sweetest fruit is climbed by those who dare to reach.",
   "In stillness, we find our true nature; in play, we discover our joy.",

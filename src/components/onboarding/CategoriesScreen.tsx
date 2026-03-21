@@ -25,7 +25,7 @@ const CATEGORIES = [
 ];
 
 interface CategoriesScreenProps {
-  onNext: () => void;
+  onNext: (categories: string[]) => void;
   onBack: () => void;
   onSkip: () => void;
 }
@@ -173,7 +173,10 @@ export function CategoriesScreen({
       </View>
 
       <View style={styles.bottomButtonContainer}>
-        <Pressable style={styles.nextButton} onPress={onNext}>
+        <Pressable
+          style={styles.nextButton}
+          onPress={() => onNext(Array.from(selected))}
+        >
           <Text style={styles.nextButtonText}>Next</Text>
         </Pressable>
       </View>
