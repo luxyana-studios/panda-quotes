@@ -16,7 +16,6 @@ interface NotificationsScreenProps {
   onNext: () => void;
   onBack: () => void;
   onSkip: () => void;
-  categories: string[];
 }
 
 const EASE_OUT = Easing.bezier(0.25, 0.46, 0.45, 0.94);
@@ -25,7 +24,6 @@ export function NotificationsScreen({
   onNext,
   onBack,
   onSkip,
-  categories,
 }: NotificationsScreenProps) {
   const [frequency, setFrequency] = useState(3);
   const [loading, setLoading] = useState(false);
@@ -38,7 +36,7 @@ export function NotificationsScreen({
     if (loading) return;
     setLoading(true);
     try {
-      const granted = await requestPermissionAndSchedule(frequency, categories);
+      const granted = await requestPermissionAndSchedule(frequency);
       if (!granted) {
         Alert.alert(
           "Notifications disabled",
@@ -71,6 +69,7 @@ export function NotificationsScreen({
     transform: [{ translateY: controlsTranslateY.value }],
   }));
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Reanimated shared values are stable refs
   useEffect(() => {
     const timer = setTimeout(() => {
       cardOpacity.value = withTiming(1, { duration: 700, easing: EASE_OUT });
