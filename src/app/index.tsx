@@ -17,9 +17,13 @@ export default function Index() {
   const { currentQuote, getNextQuote } = useQuoteManager();
 
   useEffect(() => {
-    const { notificationEnabled, notificationFrequency } =
+    const { notificationEnabled, notificationFrequency, language } =
       useSettingsStore.getState();
-    rescheduleNotificationsIfNeeded(notificationEnabled, notificationFrequency);
+    rescheduleNotificationsIfNeeded(
+      notificationEnabled,
+      notificationFrequency,
+      language,
+    );
   }, []);
 
   const handleReady = () => {

@@ -174,7 +174,7 @@ export const onboardingStyles = StyleSheet.create({
     backgroundColor: colors.brandAccent,
   },
 
-  // ─── Modi image (smaller, for screens 2-4) ────────────────
+  // ─── Hagu image (smaller, for screens 2-4) ────────────────
   smallPandaWrapper: {
     width: 90,
     height: 90,

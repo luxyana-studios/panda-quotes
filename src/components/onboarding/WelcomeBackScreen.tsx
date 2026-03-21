@@ -1,5 +1,6 @@
 import { Image } from "expo-image";
 import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { View } from "react-native";
 import Animated, {
   Easing,
@@ -17,6 +18,7 @@ interface WelcomeBackScreenProps {
 const EASE_OUT = Easing.bezier(0.25, 0.46, 0.45, 0.94);
 
 export function WelcomeBackScreen({ onComplete }: WelcomeBackScreenProps) {
+  const { t } = useTranslation();
   const imageOpacity = useSharedValue(0);
   const imageScale = useSharedValue(0.7);
   const titleOpacity = useSharedValue(0);
@@ -42,6 +44,7 @@ export function WelcomeBackScreen({ onComplete }: WelcomeBackScreenProps) {
     opacity: dotsOpacity.value,
   }));
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Reanimated shared values are stable refs
   useEffect(() => {
     const animTimer = setTimeout(() => {
       imageOpacity.value = withTiming(1, { duration: 800, easing: EASE_OUT });
@@ -85,10 +88,10 @@ export function WelcomeBackScreen({ onComplete }: WelcomeBackScreenProps) {
       </Animated.View>
 
       <Animated.Text style={[styles.welcomeBackTitle, titleStyle]}>
-        Welcome!
+        {t("onboarding.welcomeBack.title")}
       </Animated.Text>
       <Animated.Text style={[styles.welcomeBackSubtitle, subtitleStyle]}>
-        Your daily wisdom awaits
+        {t("onboarding.welcomeBack.subtitle")}
       </Animated.Text>
 
       <Animated.View style={[styles.welcomeBackDots, dotsStyle]}>

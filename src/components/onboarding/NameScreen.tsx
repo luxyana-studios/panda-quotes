@@ -1,5 +1,6 @@
 import { Image } from "expo-image";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Pressable, Text, TextInput, View } from "react-native";
 
 const CATEGORIES = [
@@ -31,6 +32,7 @@ interface NameScreenProps {
 const EASE_OUT = Easing.bezier(0.25, 0.46, 0.45, 0.94);
 
 export function NameScreen({ onNext, onBack }: NameScreenProps) {
+  const { t } = useTranslation();
   const [name, setName] = useState("");
   const [focused, setFocused] = useState(false);
 
@@ -60,7 +62,7 @@ export function NameScreen({ onNext, onBack }: NameScreenProps) {
         <Pressable style={styles.headerBackButton} onPress={onBack}>
           <Text style={styles.headerBackText}>{"\u2039"}</Text>
         </Pressable>
-        <Text style={styles.headerTitle}>About You</Text>
+        <Text style={styles.headerTitle}>{t("onboarding.name.header")}</Text>
         <View style={styles.headerSpacer} />
       </View>
 
@@ -79,10 +81,8 @@ export function NameScreen({ onNext, onBack }: NameScreenProps) {
           />
         </View>
 
-        <Text style={styles.heading}>{"What's your name?"}</Text>
-        <Text style={styles.subtitle}>
-          {"I'd love to get to know you better!"}
-        </Text>
+        <Text style={styles.heading}>{t("onboarding.name.heading")}</Text>
+        <Text style={styles.subtitle}>{t("onboarding.name.subtitle")}</Text>
 
         <View style={styles.chipGrid}>
           {CATEGORIES.map((cat) => (
@@ -93,10 +93,12 @@ export function NameScreen({ onNext, onBack }: NameScreenProps) {
         </View>
 
         <View style={styles.textInputWrapper}>
-          <Text style={styles.textInputLabel}>Your Name</Text>
+          <Text style={styles.textInputLabel}>
+            {t("onboarding.name.label")}
+          </Text>
           <TextInput
             style={[styles.textInput, focused && styles.textInputFocused]}
-            placeholder="Enter your name"
+            placeholder={t("onboarding.name.placeholder")}
             placeholderTextColor="#c4bbb0"
             value={name}
             onChangeText={setName}
@@ -110,7 +112,7 @@ export function NameScreen({ onNext, onBack }: NameScreenProps) {
 
       <View style={styles.bottomButtonContainer}>
         <Pressable style={styles.nextButton} onPress={onNext}>
-          <Text style={styles.nextButtonText}>Next</Text>
+          <Text style={styles.nextButtonText}>{t("onboarding.name.next")}</Text>
         </Pressable>
       </View>
     </View>

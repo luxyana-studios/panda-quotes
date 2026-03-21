@@ -1,5 +1,6 @@
 import { Image } from "expo-image";
 import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Pressable, Text, View } from "react-native";
 import Animated, {
   Easing,
@@ -17,6 +18,7 @@ interface WelcomeScreenProps {
 const EASE_OUT = Easing.bezier(0.25, 0.46, 0.45, 0.94);
 
 export function WelcomeScreen({ onNext }: WelcomeScreenProps) {
+  const { t } = useTranslation();
   const imageOpacity = useSharedValue(0);
   const imageTranslateY = useSharedValue(30);
   const titleOpacity = useSharedValue(0);
@@ -60,6 +62,7 @@ export function WelcomeScreen({ onNext }: WelcomeScreenProps) {
     transform: [{ translateY: buttonTranslateY.value }],
   }));
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Reanimated shared values are stable refs
   useEffect(() => {
     const timer = setTimeout(() => {
       const dur = 900;
@@ -134,24 +137,24 @@ export function WelcomeScreen({ onNext }: WelcomeScreenProps) {
         </Animated.View>
 
         <Animated.Text style={[styles.welcomeTitle, titleStyle]}>
-          {"Hey, I'm Modi!"}
+          {t("onboarding.welcome.title")}
         </Animated.Text>
 
         <Animated.Text style={[styles.welcomeSubtitle, subtitleStyle]}>
-          {"I'm here to share some wisdom"}
+          {t("onboarding.welcome.subtitle")}
         </Animated.Text>
 
         <Animated.View style={[styles.welcomeDivider, dividerStyle]} />
 
         <Animated.Text style={[styles.welcomeDescription, descriptionStyle]}>
-          {
-            "Every day, I'll bring you thoughtful quotes to inspire reflection and bring a little peace to your day."
-          }
+          {t("onboarding.welcome.description")}
         </Animated.Text>
 
         <Animated.View style={buttonStyle}>
           <Pressable style={styles.getStartedButton} onPress={onNext}>
-            <Text style={styles.getStartedButtonText}>Get Started</Text>
+            <Text style={styles.getStartedButtonText}>
+              {t("onboarding.welcome.cta")}
+            </Text>
           </Pressable>
         </Animated.View>
       </View>

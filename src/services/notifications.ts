@@ -1,6 +1,6 @@
 import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
-import { RED_PANDA_QUOTES } from "@/constants/quotes";
+import { QUOTES_BY_LANGUAGE } from "@/constants/quotes";
 
 const WINDOW_START_HOUR = 8; // 8:00 AM
 const WINDOW_END_HOUR = 21; // 9:00 PM
@@ -45,14 +45,17 @@ function computeNotificationTimes(
   return times;
 }
 
-async function scheduleNotifications(frequency: number): Promise<void> {
+async function scheduleNotifications(
+  frequency: number,
+  language: string,
+): Promise<void> {
   await Notifications.cancelAllScheduledNotificationsAsync();
 
+  const quotes = QUOTES_BY_LANGUAGE[language] ?? QUOTES_BY_LANGUAGE.en;
   const times = computeNotificationTimes(frequency);
 
   for (const { hour, minute } of times) {
-    const quote =
-      RED_PANDA_QUOTES[Math.floor(Math.random() * RED_PANDA_QUOTES.length)];
+    const quote = quotes[Math.floor(Math.random() * quotes.length)];
     await Notifications.scheduleNotificationAsync({
       content: {
         title: "Panda Quotes 🐼",
@@ -72,6 +75,7 @@ async function scheduleNotifications(frequency: number): Promise<void> {
 // Caller is responsible for persisting the result to the settings store.
 export async function requestPermissionAndSchedule(
   frequency: number,
+  language: string,
 ): Promise<boolean> {
   const { status: existingStatus } = await Notifications.getPermissionsAsync();
   let finalStatus = existingStatus;
@@ -85,7 +89,7 @@ export async function requestPermissionAndSchedule(
     return false;
   }
 
-  await scheduleNotifications(frequency);
+  await scheduleNotifications(frequency, language);
   return true;
 }
 
@@ -93,6 +97,7 @@ export async function requestPermissionAndSchedule(
 export async function rescheduleNotificationsIfNeeded(
   notificationEnabled: boolean,
   notificationFrequency: number,
+  language: string,
 ): Promise<void> {
   await setupAndroidChannel();
 
@@ -101,5 +106,5 @@ export async function rescheduleNotificationsIfNeeded(
   const { status } = await Notifications.getPermissionsAsync();
   if (status !== "granted") return;
 
-  await scheduleNotifications(notificationFrequency);
+  await scheduleNotifications(notificationFrequency, language);
 }

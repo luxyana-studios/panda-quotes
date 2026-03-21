@@ -52,6 +52,7 @@ function CategoryChip({
     opacity: chipOpacity.value,
   }));
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Reanimated shared values are stable refs
   useEffect(() => {
     const timer = setTimeout(() => {
       chipOpacity.value = withDelay(
@@ -100,6 +101,7 @@ export function CategoriesScreen({
     opacity: headerOpacity.value,
   }));
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Reanimated shared values are stable refs
   useEffect(() => {
     const timer = setTimeout(() => {
       headerOpacity.value = withTiming(1, { duration: 600, easing: EASE_OUT });

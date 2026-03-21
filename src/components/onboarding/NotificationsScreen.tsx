@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Alert, Pressable, Text, View } from "react-native";
 import Animated, {
   Easing,
@@ -8,6 +9,7 @@ import Animated, {
   withSpring,
   withTiming,
 } from "react-native-reanimated";
+import { colors } from "@/constants/colors";
 import { useSettingsStore } from "@/features/settings/stores/settings.store";
 import { requestPermissionAndSchedule } from "@/services/notifications";
 import { onboardingStyles as styles } from "@/styles/onboarding.styles";
@@ -25,23 +27,25 @@ export function NotificationsScreen({
   onBack,
   onSkip,
 }: NotificationsScreenProps) {
+  const { t } = useTranslation();
   const [frequency, setFrequency] = useState(3);
   const [loading, setLoading] = useState(false);
-  const startTime = "8:00 AM";
-  const endTime = "9:00 PM";
 
-  const { setNotificationPrefs } = useSettingsStore();
+  const { setNotificationPrefs, language } = useSettingsStore();
+
+  const startTime = t("onboarding.notifications.startTime");
+  const endTime = t("onboarding.notifications.endTime");
 
   const handleEnableNotifications = async () => {
     if (loading) return;
     setLoading(true);
     try {
-      const granted = await requestPermissionAndSchedule(frequency);
+      const granted = await requestPermissionAndSchedule(frequency, language);
       if (!granted) {
         Alert.alert(
-          "Notifications disabled",
-          "You can enable notifications later in your device Settings.",
-          [{ text: "OK", onPress: onNext }],
+          t("onboarding.notifications.alertTitle"),
+          t("onboarding.notifications.alertMessage"),
+          [{ text: t("onboarding.notifications.alertOk"), onPress: onNext }],
         );
         return;
       }
@@ -115,7 +119,9 @@ export function NotificationsScreen({
         <Pressable style={styles.headerBackButton} onPress={onBack}>
           <Text style={styles.headerBackText}>{"\u2039"}</Text>
         </Pressable>
-        <Text style={styles.headerTitle}>Notifications</Text>
+        <Text style={styles.headerTitle}>
+          {t("onboarding.notifications.header")}
+        </Text>
         <View style={styles.headerSpacer} />
       </View>
 
@@ -126,30 +132,38 @@ export function NotificationsScreen({
       </View>
 
       <View style={styles.screenContent}>
-        <Text style={styles.heading}>{"Stay inspired daily"}</Text>
+        <Text style={styles.heading}>
+          {t("onboarding.notifications.heading")}
+        </Text>
         <Text style={styles.subtitle}>
-          {"Get gentle reminders with wisdom throughout your day"}
+          {t("onboarding.notifications.subtitle")}
         </Text>
 
         <Animated.View style={[styles.notificationCard, cardStyle]}>
-          <Text style={styles.notificationCardLabel}>Preview</Text>
+          <Text style={styles.notificationCardLabel}>
+            {t("onboarding.notifications.preview")}
+          </Text>
           <View style={styles.notificationPreview}>
             <View style={styles.notificationIcon}>
               <Text style={styles.notificationIconText}>🐼</Text>
             </View>
             <View style={styles.notificationTextGroup}>
-              <Text style={styles.notificationPreviewTitle}>Panda Quotes</Text>
+              <Text style={styles.notificationPreviewTitle}>
+                {t("onboarding.notifications.previewTitle")}
+              </Text>
               <Text style={styles.notificationPreviewBody}>
-                {'"The journey of a thousand miles..."'}
+                {t("onboarding.notifications.previewBody")}
               </Text>
             </View>
-            <Text style={styles.notificationPreviewTime}>now</Text>
+            <Text style={styles.notificationPreviewTime}>
+              {t("onboarding.notifications.previewTime")}
+            </Text>
           </View>
         </Animated.View>
 
         <Animated.View style={controlsStyle}>
           <Text style={styles.frequencySectionLabel}>
-            Daily quote frequency
+            {t("onboarding.notifications.frequencyLabel")}
           </Text>
 
           <View style={styles.frequencyRow}>
@@ -181,23 +195,32 @@ export function NotificationsScreen({
 
           <View style={styles.timeRow}>
             <View style={styles.timeBlock}>
-              <Text style={styles.timeLabel}>Start</Text>
+              <Text style={styles.timeLabel}>
+                {t("onboarding.notifications.timeStart")}
+              </Text>
               <Text style={styles.timeValue}>{startTime}</Text>
             </View>
             <View style={styles.timeBlock}>
-              <Text style={styles.timeLabel}>End</Text>
+              <Text style={styles.timeLabel}>
+                {t("onboarding.notifications.timeEnd")}
+              </Text>
               <Text style={styles.timeValue}>{endTime}</Text>
             </View>
           </View>
 
           <Text style={styles.summaryText}>
-            {"You'll receive "}
-            {frequency} {frequency === 1 ? "quote" : "quotes"}
-            {" per day between "}
-            {startTime}
-            {" and "}
-            {endTime}
+            {t("onboarding.notifications.summary", {
+              count: frequency,
+              start: startTime,
+              end: endTime,
+            })}
           </Text>
+
+          <Pressable style={skipButtonStyle} onPress={onSkip}>
+            <Text style={skipButtonTextStyle}>
+              {t("onboarding.notifications.later")}
+            </Text>
+          </Pressable>
         </Animated.View>
       </View>
 
@@ -213,13 +236,27 @@ export function NotificationsScreen({
               loading && styles.nextButtonTextDisabled,
             ]}
           >
-            {loading ? "Setting up..." : "Enable notifications"}
+            {loading
+              ? t("onboarding.notifications.settingUp")
+              : t("onboarding.notifications.enable")}
           </Text>
-        </Pressable>
-        <Pressable style={styles.headerSkipButton} onPress={onSkip}>
-          <Text style={styles.headerSkipText}>Maybe later</Text>
         </Pressable>
       </View>
     </View>
   );
 }
+
+const skipButtonStyle: import("react-native").ViewStyle = {
+  alignSelf: "center",
+  marginTop: 20,
+  paddingVertical: 8,
+  paddingHorizontal: 16,
+};
+
+const skipButtonTextStyle: import("react-native").TextStyle = {
+  fontSize: 14,
+  color: colors.brandPrimary,
+  fontWeight: "500",
+  textDecorationLine: "underline",
+  opacity: 0.75,
+};

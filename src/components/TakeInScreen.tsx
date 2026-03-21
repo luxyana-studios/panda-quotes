@@ -1,5 +1,6 @@
 import { Image } from "expo-image";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Pressable, Text, View } from "react-native";
 import Animated, {
   Easing,
@@ -23,6 +24,7 @@ export function TakeInScreen({
   onSitWithThis,
   onDrawWisdom,
 }: TakeInScreenProps) {
+  const { t } = useTranslation();
   const [showButtons, setShowButtons] = useState(false);
 
   const imageOpacity = useSharedValue(0);
@@ -52,6 +54,7 @@ export function TakeInScreen({
     transform: [{ translateY: buttonTranslateY.value }],
   }));
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Reanimated shared values are stable refs
   useEffect(() => {
     const timer = setTimeout(() => {
       imageOpacity.value = withTiming(1, { duration: 800, easing: EASE_OUT });
@@ -102,7 +105,7 @@ export function TakeInScreen({
       <Animated.View style={[styles.quoteContainer, quoteStyle]}>
         <Text style={styles.quoteText}>{currentQuote}</Text>
         <Animated.Text style={[styles.author, authorStyle]}>
-          — Red Panda Philosopher
+          {t("takeIn.attribution")}
         </Animated.Text>
       </Animated.View>
 
@@ -112,12 +115,12 @@ export function TakeInScreen({
             <View style={styles.buttonContainer}>
               <Pressable style={styles.primaryButton} onPress={onSitWithThis}>
                 <Text style={styles.primaryButtonText}>
-                  {"I'll sit with this"}
+                  {t("takeIn.sitWithThis")}
                 </Text>
               </Pressable>
               <Pressable style={styles.secondaryButton} onPress={onDrawWisdom}>
                 <Text style={styles.secondaryButtonText}>
-                  Ask another question
+                  {t("takeIn.askAnother")}
                 </Text>
               </Pressable>
             </View>

@@ -58,6 +58,9 @@ export const useSettingsStore = create<SettingsState>()(
       onRehydrateStorage: () => (state) => {
         if (!state) return;
         state.setThemeMode(state.themeMode);
+        if (state.language) {
+          i18n.changeLanguage(state.language);
+        }
       },
     },
   ),
