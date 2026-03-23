@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -23,6 +23,11 @@ const LANGUAGES = [
   { code: "es", label: "Español", flag: "🇪🇸" },
   { code: "de", label: "Deutsch", flag: "🇩🇪" },
   { code: "fr", label: "Français", flag: "🇫🇷" },
+  { code: "zh", label: "中文", flag: "🇨🇳" },
+  { code: "hi", label: "हिन्दी", flag: "🇮🇳" },
+  { code: "it", label: "Italiano", flag: "🇮🇹" },
+  { code: "ja", label: "日本語", flag: "🇯🇵" },
+  { code: "pt", label: "Português", flag: "🇧🇷" },
 ] as const;
 
 export function LanguageScreen({ onNext }: LanguageScreenProps) {
@@ -102,27 +107,29 @@ export function LanguageScreen({ onNext }: LanguageScreenProps) {
         </Animated.Text>
 
         <Animated.View style={[styles.list, listStyle]}>
-          {LANGUAGES.map((lang) => {
-            const isSelected = selected === lang.code;
-            return (
-              <Pressable
-                key={lang.code}
-                style={[styles.option, isSelected && styles.optionSelected]}
-                onPress={() => handleSelect(lang.code)}
-              >
-                <Text style={styles.flag}>{lang.flag}</Text>
-                <Text
-                  style={[
-                    styles.optionLabel,
-                    isSelected && styles.optionLabelSelected,
-                  ]}
+          <ScrollView showsVerticalScrollIndicator={false} bounces={false}>
+            {LANGUAGES.map((lang) => {
+              const isSelected = selected === lang.code;
+              return (
+                <Pressable
+                  key={lang.code}
+                  style={[styles.option, isSelected && styles.optionSelected]}
+                  onPress={() => handleSelect(lang.code)}
                 >
-                  {lang.label}
-                </Text>
-                {isSelected && <Text style={styles.checkmark}>✓</Text>}
-              </Pressable>
-            );
-          })}
+                  <Text style={styles.flag}>{lang.flag}</Text>
+                  <Text
+                    style={[
+                      styles.optionLabel,
+                      isSelected && styles.optionLabelSelected,
+                    ]}
+                  >
+                    {lang.label}
+                  </Text>
+                  {isSelected && <Text style={styles.checkmark}>✓</Text>}
+                </Pressable>
+              );
+            })}
+          </ScrollView>
         </Animated.View>
 
         <Animated.View style={[styles.buttonWrapper, buttonStyle]}>
