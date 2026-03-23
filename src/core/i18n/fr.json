@@ -56,5 +56,22 @@
   "language.hi": "हिन्दी",
   "language.it": "Italiano",
   "language.ja": "日本語",
-  "language.pt": "Português"
+  "language.pt": "Português",
+  "onboarding.categories.header": "Thèmes",
+  "onboarding.categories.heading": "Qu'est-ce qui vous apporte de la joie ?",
+  "onboarding.categories.subtitle": "Choisissez les thèmes que vous souhaitez explorer",
+  "onboarding.categories.skip": "Passer",
+  "onboarding.categories.next": "Suivant",
+  "onboarding.categories.selected_one": "{{count}} thème sélectionné",
+  "onboarding.categories.selected_other": "{{count}} thèmes sélectionnés",
+  "onboarding.categories.wisdom": "Sagesse",
+  "onboarding.categories.patience": "Patience",
+  "onboarding.categories.joy": "Joie",
+  "onboarding.categories.nature": "Nature",
+  "onboarding.categories.humor": "Humour",
+  "onboarding.categories.courage": "Courage",
+  "onboarding.categories.peace": "Paix",
+  "onboarding.categories.growth": "Croissance",
+  "onboarding.categories.resilience": "Résilience",
+  "onboarding.categories.selfDiscovery": "Découverte de soi"
 }

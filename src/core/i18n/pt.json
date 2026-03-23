@@ -56,5 +56,22 @@
   "language.hi": "हिन्दी",
   "language.it": "Italiano",
   "language.ja": "日本語",
-  "language.pt": "Português"
+  "language.pt": "Português",
+  "onboarding.categories.header": "Temas",
+  "onboarding.categories.heading": "O que te traz alegria?",
+  "onboarding.categories.subtitle": "Escolha os temas que gostaria de explorar",
+  "onboarding.categories.skip": "Pular",
+  "onboarding.categories.next": "Próximo",
+  "onboarding.categories.selected_one": "{{count}} tema selecionado",
+  "onboarding.categories.selected_other": "{{count}} temas selecionados",
+  "onboarding.categories.wisdom": "Sabedoria",
+  "onboarding.categories.patience": "Paciência",
+  "onboarding.categories.joy": "Alegria",
+  "onboarding.categories.nature": "Natureza",
+  "onboarding.categories.humor": "Humor",
+  "onboarding.categories.courage": "Coragem",
+  "onboarding.categories.peace": "Paz",
+  "onboarding.categories.growth": "Crescimento",
+  "onboarding.categories.resilience": "Resiliência",
+  "onboarding.categories.selfDiscovery": "Autodescoberta"
 }

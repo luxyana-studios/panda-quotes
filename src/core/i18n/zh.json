@@ -56,5 +56,22 @@
   "language.hi": "हिन्दी",
   "language.it": "Italiano",
   "language.ja": "日本語",
-  "language.pt": "Português"
+  "language.pt": "Português",
+  "onboarding.categories.header": "主题",
+  "onboarding.categories.heading": "什么带给你喜悦？",
+  "onboarding.categories.subtitle": "选择你想探索的主题",
+  "onboarding.categories.skip": "跳过",
+  "onboarding.categories.next": "下一步",
+  "onboarding.categories.selected_one": "已选择 {{count}} 个主题",
+  "onboarding.categories.selected_other": "已选择 {{count}} 个主题",
+  "onboarding.categories.wisdom": "智慧",
+  "onboarding.categories.patience": "耐心",
+  "onboarding.categories.joy": "喜悦",
+  "onboarding.categories.nature": "自然",
+  "onboarding.categories.humor": "幽默",
+  "onboarding.categories.courage": "勇气",
+  "onboarding.categories.peace": "平静",
+  "onboarding.categories.growth": "成长",
+  "onboarding.categories.resilience": "韧性",
+  "onboarding.categories.selfDiscovery": "自我探索"
 }

@@ -1,5 +1,6 @@
 import { Image } from "expo-image";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Pressable, Text, View } from "react-native";
 import Animated, {
   Easing,
@@ -11,26 +12,26 @@ import Animated, {
 } from "react-native-reanimated";
 import { onboardingStyles as styles } from "@/styles/onboarding.styles";
 
-const CATEGORIES = [
-  "Wisdom",
-  "Patience",
-  "Joy",
-  "Nature",
-  "Humor",
-  "Courage",
-  "Peace",
-  "Growth",
-  "Resilience",
-  "Self-discovery",
-];
-
 interface CategoriesScreenProps {
-  onNext: (categories: string[]) => void;
+  onNext: () => void;
   onBack: () => void;
   onSkip: () => void;
 }
 
 const EASE_OUT = Easing.bezier(0.25, 0.46, 0.45, 0.94);
+
+const CATEGORY_KEYS = [
+  "wisdom",
+  "patience",
+  "joy",
+  "nature",
+  "humor",
+  "courage",
+  "peace",
+  "growth",
+  "resilience",
+  "selfDiscovery",
+] as const;
 
 function CategoryChip({
   label,
@@ -94,6 +95,7 @@ export function CategoriesScreen({
   onBack,
   onSkip,
 }: CategoriesScreenProps) {
+  const { t } = useTranslation();
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
   const headerOpacity = useSharedValue(0);
@@ -109,13 +111,13 @@ export function CategoriesScreen({
     return () => clearTimeout(timer);
   }, []);
 
-  const toggleCategory = (category: string) => {
+  const toggleCategory = (key: string) => {
     setSelected((prev) => {
       const next = new Set(prev);
-      if (next.has(category)) {
-        next.delete(category);
+      if (next.has(key)) {
+        next.delete(key);
       } else {
-        next.add(category);
+        next.add(key);
       }
       return next;
     });
@@ -127,9 +129,13 @@ export function CategoriesScreen({
         <Pressable style={styles.headerBackButton} onPress={onBack}>
           <Text style={styles.headerBackText}>{"\u2039"}</Text>
         </Pressable>
-        <Text style={styles.headerTitle}>Categories</Text>
+        <Text style={styles.headerTitle}>
+          {t("onboarding.categories.header")}
+        </Text>
         <Pressable style={styles.headerSkipButton} onPress={onSkip}>
-          <Text style={styles.headerSkipText}>Skip</Text>
+          <Text style={styles.headerSkipText}>
+            {t("onboarding.categories.skip")}
+          </Text>
         </Pressable>
       </View>
 
@@ -149,19 +155,21 @@ export function CategoriesScreen({
             />
           </View>
 
-          <Text style={styles.heading}>What brings you joy?</Text>
+          <Text style={styles.heading}>
+            {t("onboarding.categories.heading")}
+          </Text>
           <Text style={styles.subtitle}>
-            {"Choose the themes you'd like to explore"}
+            {t("onboarding.categories.subtitle")}
           </Text>
         </Animated.View>
 
         <View style={styles.chipGrid}>
-          {CATEGORIES.map((cat, i) => (
+          {CATEGORY_KEYS.map((key, i) => (
             <CategoryChip
-              key={cat}
-              label={cat}
-              selected={selected.has(cat)}
-              onPress={() => toggleCategory(cat)}
+              key={key}
+              label={t(`onboarding.categories.${key}`)}
+              selected={selected.has(key)}
+              onPress={() => toggleCategory(key)}
               delay={i * 60}
             />
           ))}
@@ -169,17 +177,16 @@ export function CategoriesScreen({
 
         {selected.size > 0 && (
           <Text style={styles.chipCount}>
-            {selected.size} {selected.size === 1 ? "theme" : "themes"} selected
+            {t("onboarding.categories.selected", { count: selected.size })}
           </Text>
         )}
       </View>
 
       <View style={styles.bottomButtonContainer}>
-        <Pressable
-          style={styles.nextButton}
-          onPress={() => onNext(Array.from(selected))}
-        >
-          <Text style={styles.nextButtonText}>Next</Text>
+        <Pressable style={styles.nextButton} onPress={onNext}>
+          <Text style={styles.nextButtonText}>
+            {t("onboarding.categories.next")}
+          </Text>
         </Pressable>
       </View>
     </View>

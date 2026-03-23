@@ -56,5 +56,22 @@
   "language.hi": "हिन्दी",
   "language.it": "Italiano",
   "language.ja": "日本語",
-  "language.pt": "Português"
+  "language.pt": "Português",
+  "onboarding.categories.header": "Themen",
+  "onboarding.categories.heading": "Was bereitet dir Freude?",
+  "onboarding.categories.subtitle": "Wähle die Themen, die du erkunden möchtest",
+  "onboarding.categories.skip": "Überspringen",
+  "onboarding.categories.next": "Weiter",
+  "onboarding.categories.selected_one": "{{count}} Thema ausgewählt",
+  "onboarding.categories.selected_other": "{{count}} Themen ausgewählt",
+  "onboarding.categories.wisdom": "Weisheit",
+  "onboarding.categories.patience": "Geduld",
+  "onboarding.categories.joy": "Freude",
+  "onboarding.categories.nature": "Natur",
+  "onboarding.categories.humor": "Humor",
+  "onboarding.categories.courage": "Mut",
+  "onboarding.categories.peace": "Frieden",
+  "onboarding.categories.growth": "Wachstum",
+  "onboarding.categories.resilience": "Resilienz",
+  "onboarding.categories.selfDiscovery": "Selbstentdeckung"
 }

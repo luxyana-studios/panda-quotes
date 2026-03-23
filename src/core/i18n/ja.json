@@ -56,5 +56,22 @@
   "language.hi": "हिन्दी",
   "language.it": "Italiano",
   "language.ja": "日本語",
-  "language.pt": "Português"
+  "language.pt": "Português",
+  "onboarding.categories.header": "テーマ",
+  "onboarding.categories.heading": "何があなたに喜びをもたらしますか？",
+  "onboarding.categories.subtitle": "探求したいテーマを選んでください",
+  "onboarding.categories.skip": "スキップ",
+  "onboarding.categories.next": "次へ",
+  "onboarding.categories.selected_one": "{{count}}つのテーマを選択済み",
+  "onboarding.categories.selected_other": "{{count}}つのテーマを選択済み",
+  "onboarding.categories.wisdom": "知恵",
+  "onboarding.categories.patience": "忍耐",
+  "onboarding.categories.joy": "喜び",
+  "onboarding.categories.nature": "自然",
+  "onboarding.categories.humor": "ユーモア",
+  "onboarding.categories.courage": "勇気",
+  "onboarding.categories.peace": "平和",
+  "onboarding.categories.growth": "成長",
+  "onboarding.categories.resilience": "回復力",
+  "onboarding.categories.selfDiscovery": "自己発見"
 }

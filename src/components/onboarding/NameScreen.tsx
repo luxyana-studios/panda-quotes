@@ -2,20 +2,6 @@ import { Image } from "expo-image";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, Text, TextInput, View } from "react-native";
-
-const CATEGORIES = [
-  "Wisdom",
-  "Patience",
-  "Joy",
-  "Nature",
-  "Humor",
-  "Courage",
-  "Peace",
-  "Growth",
-  "Resilience",
-  "Self-discovery",
-];
-
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -83,14 +69,6 @@ export function NameScreen({ onNext, onBack }: NameScreenProps) {
 
         <Text style={styles.heading}>{t("onboarding.name.heading")}</Text>
         <Text style={styles.subtitle}>{t("onboarding.name.subtitle")}</Text>
-
-        <View style={styles.chipGrid}>
-          {CATEGORIES.map((cat) => (
-            <View key={cat} style={styles.chip}>
-              <Text style={styles.chipText}>{cat}</Text>
-            </View>
-          ))}
-        </View>
 
         <View style={styles.textInputWrapper}>
           <Text style={styles.textInputLabel}>

@@ -56,5 +56,22 @@
   "language.hi": "हिन्दी",
   "language.it": "Italiano",
   "language.ja": "日本語",
-  "language.pt": "Português"
+  "language.pt": "Português",
+  "onboarding.categories.header": "विषय",
+  "onboarding.categories.heading": "आपको क्या खुशी लाता है?",
+  "onboarding.categories.subtitle": "वे विषय चुनें जिन्हें आप खोजना चाहते हैं",
+  "onboarding.categories.skip": "छोड़ें",
+  "onboarding.categories.next": "आगे",
+  "onboarding.categories.selected_one": "{{count}} विषय चुना गया",
+  "onboarding.categories.selected_other": "{{count}} विषय चुने गए",
+  "onboarding.categories.wisdom": "ज्ञान",
+  "onboarding.categories.patience": "धैर्य",
+  "onboarding.categories.joy": "आनंद",
+  "onboarding.categories.nature": "प्रकृति",
+  "onboarding.categories.humor": "हास्य",
+  "onboarding.categories.courage": "साहस",
+  "onboarding.categories.peace": "शांति",
+  "onboarding.categories.growth": "विकास",
+  "onboarding.categories.resilience": "लचीलापन",
+  "onboarding.categories.selfDiscovery": "आत्म-खोज"
 }

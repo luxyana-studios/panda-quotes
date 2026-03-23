@@ -56,5 +56,22 @@
   "language.hi": "हिन्दी",
   "language.it": "Italiano",
   "language.ja": "日本語",
-  "language.pt": "Português"
+  "language.pt": "Português",
+  "onboarding.categories.header": "Temi",
+  "onboarding.categories.heading": "Cosa ti porta gioia?",
+  "onboarding.categories.subtitle": "Scegli i temi che vorresti esplorare",
+  "onboarding.categories.skip": "Salta",
+  "onboarding.categories.next": "Avanti",
+  "onboarding.categories.selected_one": "{{count}} tema selezionato",
+  "onboarding.categories.selected_other": "{{count}} temi selezionati",
+  "onboarding.categories.wisdom": "Saggezza",
+  "onboarding.categories.patience": "Pazienza",
+  "onboarding.categories.joy": "Gioia",
+  "onboarding.categories.nature": "Natura",
+  "onboarding.categories.humor": "Umorismo",
+  "onboarding.categories.courage": "Coraggio",
+  "onboarding.categories.peace": "Pace",
+  "onboarding.categories.growth": "Crescita",
+  "onboarding.categories.resilience": "Resilienza",
+  "onboarding.categories.selfDiscovery": "Scoperta di sé"
 }
