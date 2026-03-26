@@ -16,6 +16,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { colors } from "@/constants/colors";
+import { LANGUAGES } from "@/constants/languages";
 import { deviceSuggestedLanguage } from "@/core/i18n";
 import { rs } from "@/core/theme/responsive";
 import { useSettingsStore } from "@/features/settings/stores/settings.store";
@@ -25,18 +26,6 @@ interface LanguageScreenProps {
 }
 
 const EASE_OUT = Easing.bezier(0.25, 0.46, 0.45, 0.94);
-
-const LANGUAGES = [
-  { code: "en", label: "English", flag: "🇬🇧" },
-  { code: "es", label: "Español", flag: "🇪🇸" },
-  { code: "de", label: "Deutsch", flag: "🇩🇪" },
-  { code: "fr", label: "Français", flag: "🇫🇷" },
-  { code: "zh", label: "中文", flag: "🇨🇳" },
-  { code: "hi", label: "हिन्दी", flag: "🇮🇳" },
-  { code: "it", label: "Italiano", flag: "🇮🇹" },
-  { code: "ja", label: "日本語", flag: "🇯🇵" },
-  { code: "pt", label: "Português", flag: "🇧🇷" },
-] as const;
 
 export function LanguageScreen({ onNext }: LanguageScreenProps) {
   const { t } = useTranslation();
@@ -129,7 +118,6 @@ export function LanguageScreen({ onNext }: LanguageScreenProps) {
                     style={[
                       styles.optionLabel,
                       isSelected && styles.optionLabelSelected,
-                      lang.code === "hi" && styles.optionLabelDevanagari,
                     ]}
                   >
                     {lang.label}
@@ -204,7 +192,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: "transparent",
     gap: rs(12),
-    marginBottom: rs(10),
+    marginBottom: rs(16),
   },
   optionSelected: {
     backgroundColor: "rgba(255,255,255,0.95)",
@@ -221,11 +209,6 @@ const styles = StyleSheet.create({
   },
   optionLabelSelected: {
     color: colors.brandDark,
-  },
-  optionLabelDevanagari: {
-    ...Platform.select({
-      web: { fontFamily: "'Noto Sans Devanagari', sans-serif" },
-    }),
   },
   checkmark: {
     fontSize: 16,

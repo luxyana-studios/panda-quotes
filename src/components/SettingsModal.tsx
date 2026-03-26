@@ -13,6 +13,7 @@ import {
   View,
 } from "react-native";
 import { colors } from "@/constants/colors";
+import { LANGUAGES } from "@/constants/languages";
 import { WEB_MAX_WIDTH } from "@/core/theme/responsive";
 import { useSettingsStore } from "@/features/settings/stores/settings.store";
 import {
@@ -24,18 +25,6 @@ interface SettingsModalProps {
   visible: boolean;
   onClose: () => void;
 }
-
-const LANGUAGES = [
-  { code: "en", label: "English", flag: "🇬🇧" },
-  { code: "es", label: "Español", flag: "🇪🇸" },
-  { code: "de", label: "Deutsch", flag: "🇩🇪" },
-  { code: "fr", label: "Français", flag: "🇫🇷" },
-  { code: "zh", label: "中文", flag: "🇨🇳" },
-  { code: "hi", label: "हिन्दी", flag: "🇮🇳" },
-  { code: "it", label: "Italiano", flag: "🇮🇹" },
-  { code: "ja", label: "日本語", flag: "🇯🇵" },
-  { code: "pt", label: "Português", flag: "🇧🇷" },
-] as const;
 
 export function SettingsModal({ visible, onClose }: SettingsModalProps) {
   const { t } = useTranslation();
@@ -63,12 +52,13 @@ export function SettingsModal({ visible, onClose }: SettingsModalProps) {
 
   const handleLanguageSelect = (code: string) => {
     setSelectedLanguage(code);
-    setLanguage(code);
   };
 
   const handleSave = async () => {
     if (saving) return;
     setSaving(true);
+    // Persist selected language on save
+    setLanguage(selectedLanguage);
     try {
       if (Platform.OS === "web") {
         // Notifications are not available on web — just persist the preference
@@ -151,7 +141,6 @@ export function SettingsModal({ visible, onClose }: SettingsModalProps) {
                     style={[
                       styles.languageLabel,
                       isSelected && styles.languageLabelSelected,
-                      lang.code === "hi" && styles.languageLabelDevanagari,
                     ]}
                   >
                     {lang.label}
@@ -313,11 +302,6 @@ const styles = StyleSheet.create({
   languageLabelSelected: {
     fontWeight: "700",
     color: colors.brandDark,
-  },
-  languageLabelDevanagari: {
-    ...Platform.select({
-      web: { fontFamily: "'Noto Sans Devanagari', sans-serif" },
-    }),
   },
   checkmark: {
     fontSize: 15,
