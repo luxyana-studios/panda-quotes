@@ -60,9 +60,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
     case "name":
       return <NameScreen onNext={goNext} onBack={goBack} />;
     case "categories":
-      return (
-        <CategoriesScreen onNext={goNext} onBack={goBack} onSkip={goNext} />
-      );
+      return <CategoriesScreen onNext={goNext} onBack={goBack} />;
     case "notifications":
       return (
         <NotificationsScreen

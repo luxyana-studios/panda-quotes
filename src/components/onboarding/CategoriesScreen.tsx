@@ -15,7 +15,6 @@ import { onboardingStyles as styles } from "@/styles/onboarding.styles";
 interface CategoriesScreenProps {
   onNext: () => void;
   onBack: () => void;
-  onSkip: () => void;
 }
 
 const EASE_OUT = Easing.bezier(0.25, 0.46, 0.45, 0.94);
@@ -90,11 +89,7 @@ function CategoryChip({
   );
 }
 
-export function CategoriesScreen({
-  onNext,
-  onBack,
-  onSkip,
-}: CategoriesScreenProps) {
+export function CategoriesScreen({ onNext, onBack }: CategoriesScreenProps) {
   const { t } = useTranslation();
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
@@ -132,11 +127,7 @@ export function CategoriesScreen({
         <Text style={styles.headerTitle}>
           {t("onboarding.categories.header")}
         </Text>
-        <Pressable style={styles.headerSkipButton} onPress={onSkip}>
-          <Text style={styles.headerSkipText}>
-            {t("onboarding.categories.skip")}
-          </Text>
-        </Pressable>
+        <View style={styles.headerSpacer} />
       </View>
 
       <View style={styles.progressContainer}>

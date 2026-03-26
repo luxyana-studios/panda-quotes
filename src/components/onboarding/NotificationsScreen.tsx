@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Alert, Pressable, Text, View } from "react-native";
+import { Alert, Platform, Pressable, Text, View } from "react-native";
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -40,6 +40,12 @@ export function NotificationsScreen({
     if (loading) return;
     setLoading(true);
     try {
+      if (Platform.OS === "web") {
+        // Notifications not supported on web — save preference and move on
+        setNotificationPrefs(false, frequency);
+        onNext();
+        return;
+      }
       const granted = await requestPermissionAndSchedule(frequency, language);
       if (!granted) {
         Alert.alert(

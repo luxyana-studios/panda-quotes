@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import {
   Alert,
   Modal,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -12,6 +13,7 @@ import {
   View,
 } from "react-native";
 import { colors } from "@/constants/colors";
+import { WEB_MAX_WIDTH } from "@/core/theme/responsive";
 import { useSettingsStore } from "@/features/settings/stores/settings.store";
 import {
   requestPermissionAndSchedule,
@@ -68,7 +70,10 @@ export function SettingsModal({ visible, onClose }: SettingsModalProps) {
     if (saving) return;
     setSaving(true);
     try {
-      if (notifEnabled) {
+      if (Platform.OS === "web") {
+        // Notifications are not available on web — just persist the preference
+        setNotificationPrefs(notifEnabled, frequency);
+      } else if (notifEnabled) {
         const { status } = await Notifications.getPermissionsAsync();
         if (status !== "granted") {
           const granted = await requestPermissionAndSchedule(
@@ -146,6 +151,7 @@ export function SettingsModal({ visible, onClose }: SettingsModalProps) {
                     style={[
                       styles.languageLabel,
                       isSelected && styles.languageLabelSelected,
+                      lang.code === "hi" && styles.languageLabelDevanagari,
                     ]}
                   >
                     {lang.label}
@@ -221,6 +227,13 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 28,
     maxHeight: "85%",
     paddingBottom: 0,
+    ...Platform.select({
+      web: {
+        maxWidth: WEB_MAX_WIDTH,
+        width: "100%" as const,
+        alignSelf: "center" as const,
+      },
+    }),
   },
   header: {
     flexDirection: "row",
@@ -300,6 +313,11 @@ const styles = StyleSheet.create({
   languageLabelSelected: {
     fontWeight: "700",
     color: colors.brandDark,
+  },
+  languageLabelDevanagari: {
+    ...Platform.select({
+      web: { fontFamily: "'Noto Sans Devanagari', sans-serif" },
+    }),
   },
   checkmark: {
     fontSize: 15,

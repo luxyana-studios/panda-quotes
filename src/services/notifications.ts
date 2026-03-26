@@ -6,15 +6,17 @@ const WINDOW_START_HOUR = 8; // 8:00 AM
 const WINDOW_END_HOUR = 21; // 9:00 PM
 const WINDOW_MINUTES = (WINDOW_END_HOUR - WINDOW_START_HOUR) * 60; // 780
 
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldShowBanner: true,
-    shouldShowList: true,
-    shouldPlaySound: false,
-    shouldSetBadge: false,
-  }),
-});
+if (Platform.OS !== "web") {
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldShowBanner: true,
+      shouldShowList: true,
+      shouldPlaySound: false,
+      shouldSetBadge: false,
+    }),
+  });
+}
 
 export async function setupAndroidChannel(): Promise<void> {
   if (Platform.OS !== "android") return;
@@ -77,6 +79,7 @@ export async function requestPermissionAndSchedule(
   frequency: number,
   language: string,
 ): Promise<boolean> {
+  if (Platform.OS === "web") return false;
   const { status: existingStatus } = await Notifications.getPermissionsAsync();
   let finalStatus = existingStatus;
 
@@ -99,6 +102,7 @@ export async function rescheduleNotificationsIfNeeded(
   notificationFrequency: number,
   language: string,
 ): Promise<void> {
+  if (Platform.OS === "web") return;
   await setupAndroidChannel();
 
   if (!notificationEnabled) return;

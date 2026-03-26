@@ -1,6 +1,13 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -10,6 +17,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { colors } from "@/constants/colors";
 import { deviceSuggestedLanguage } from "@/core/i18n";
+import { rs } from "@/core/theme/responsive";
 import { useSettingsStore } from "@/features/settings/stores/settings.store";
 
 interface LanguageScreenProps {
@@ -121,6 +129,7 @@ export function LanguageScreen({ onNext }: LanguageScreenProps) {
                     style={[
                       styles.optionLabel,
                       isSelected && styles.optionLabelSelected,
+                      lang.code === "hi" && styles.optionLabelDevanagari,
                     ]}
                   >
                     {lang.label}
@@ -169,49 +178,54 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
     paddingHorizontal: 32,
-    gap: 0,
+    paddingTop: Platform.select({ web: 40, default: 56 }),
+    paddingBottom: 24,
   },
   title: {
-    fontSize: 28,
+    fontSize: rs(28),
     fontWeight: "800",
     color: "#ffffff",
     textAlign: "center",
     letterSpacing: -0.3,
-    marginBottom: 32,
+    marginBottom: rs(24),
   },
   list: {
+    flex: 1,
     width: "100%",
-    gap: 12,
   },
   option: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "rgba(255,255,255,0.15)",
-    borderRadius: 18,
-    paddingVertical: 18,
-    paddingHorizontal: 24,
+    borderRadius: rs(18),
+    paddingVertical: rs(16),
+    paddingHorizontal: rs(20),
     borderWidth: 2,
     borderColor: "transparent",
-    gap: 14,
+    gap: rs(12),
+    marginBottom: rs(10),
   },
   optionSelected: {
     backgroundColor: "rgba(255,255,255,0.95)",
     borderColor: "rgba(255,255,255,0.5)",
   },
   flag: {
-    fontSize: 24,
+    fontSize: rs(24),
   },
   optionLabel: {
     flex: 1,
-    fontSize: 18,
+    fontSize: rs(17),
     fontWeight: "600",
     color: "rgba(255,255,255,0.9)",
   },
   optionLabelSelected: {
     color: colors.brandDark,
+  },
+  optionLabelDevanagari: {
+    ...Platform.select({
+      web: { fontFamily: "'Noto Sans Devanagari', sans-serif" },
+    }),
   },
   checkmark: {
     fontSize: 16,
@@ -220,11 +234,11 @@ const styles = StyleSheet.create({
   },
   buttonWrapper: {
     width: "100%",
-    marginTop: 32,
+    marginTop: 16,
   },
   continueButton: {
     backgroundColor: "#ffffff",
-    paddingVertical: 17,
+    paddingVertical: rs(17),
     borderRadius: 30,
     alignItems: "center",
     shadowColor: "rgba(0,0,0,0.3)",
@@ -235,7 +249,7 @@ const styles = StyleSheet.create({
   },
   continueButtonText: {
     color: colors.brandDark,
-    fontSize: 17,
+    fontSize: rs(17),
     fontWeight: "700",
     letterSpacing: 0.3,
   },

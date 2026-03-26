@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { useVideoPlayer, VideoView } from "expo-video";
 import { useEffect, useRef, useState } from "react";
@@ -190,7 +191,11 @@ export function StartScreen({ onReady }: StartScreenProps) {
         style={settingsButtonStyle}
         onPress={() => setShowSettings(true)}
       >
-        <Text style={settingsButtonIconStyle}>⚙</Text>
+        <Ionicons
+          name="earth-outline"
+          size={22}
+          color="rgba(255,255,255,0.9)"
+        />
       </Pressable>
 
       <SettingsModal
@@ -245,18 +250,15 @@ export function StartScreen({ onReady }: StartScreenProps) {
 
 const settingsButtonStyle: import("react-native").ViewStyle = {
   position: "absolute",
-  top: 56,
-  right: 20,
-  width: 38,
-  height: 38,
-  borderRadius: 19,
-  backgroundColor: "rgba(255,255,255,0.2)",
+  top: 52,
+  right: 16,
+  width: 42,
+  height: 42,
+  borderRadius: 21,
+  backgroundColor: "rgba(255,255,255,0.25)",
   justifyContent: "center",
   alignItems: "center",
   zIndex: 10,
-};
-
-const settingsButtonIconStyle: import("react-native").TextStyle = {
-  fontSize: 18,
-  color: "rgba(255,255,255,0.85)",
+  borderWidth: 1.5,
+  borderColor: "rgba(255,255,255,0.35)",
 };
