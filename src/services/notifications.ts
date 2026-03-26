@@ -80,6 +80,7 @@ export async function requestPermissionAndSchedule(
   language: string,
 ): Promise<boolean> {
   if (Platform.OS === "web") return false;
+  await setupAndroidChannel();
   const { status: existingStatus } = await Notifications.getPermissionsAsync();
   let finalStatus = existingStatus;
 

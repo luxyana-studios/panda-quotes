@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { QUOTES_BY_LANGUAGE } from "@/constants/quotes";
 
@@ -10,6 +10,13 @@ export function useQuoteManager() {
     Math.floor(Math.random() * quotes.length),
   );
   const [usedIndices, setUsedIndices] = useState<number[]>([]);
+
+  useEffect(() => {
+    const newQuotes =
+      QUOTES_BY_LANGUAGE[i18n.language] ?? QUOTES_BY_LANGUAGE.en;
+    setCurrentQuoteIndex(Math.floor(Math.random() * newQuotes.length));
+    setUsedIndices([]);
+  }, [i18n.language]);
 
   const currentQuote = quotes[currentQuoteIndex];
 

@@ -151,43 +151,55 @@ export function SettingsModal({ visible, onClose }: SettingsModalProps) {
             })}
           </View>
 
-          {/* Notifications section */}
-          <Text style={styles.sectionTitle}>{t("settings.notifications")}</Text>
-          <View style={styles.card}>
-            <View style={styles.toggleRow}>
-              <Text style={styles.toggleLabel}>
-                {t("settings.notificationsToggle")}
+          {/* Notifications section (native only) */}
+          {Platform.OS !== "web" && (
+            <>
+              <Text style={styles.sectionTitle}>
+                {t("settings.notifications")}
               </Text>
-              <Switch
-                value={notifEnabled}
-                onValueChange={setNotifEnabled}
-                trackColor={{
-                  false: colors.earthSand,
-                  true: colors.brandAccent,
-                }}
-                thumbColor="#ffffff"
-              />
-            </View>
+              <View style={styles.card}>
+                <View style={styles.toggleRow}>
+                  <Text style={styles.toggleLabel}>
+                    {t("settings.notificationsToggle")}
+                  </Text>
+                  <Switch
+                    value={notifEnabled}
+                    onValueChange={setNotifEnabled}
+                    trackColor={{
+                      false: colors.earthSand,
+                      true: colors.brandAccent,
+                    }}
+                    thumbColor="#ffffff"
+                  />
+                </View>
 
-            <View style={styles.frequencyRow}>
-              <Pressable
-                style={[styles.freqButton, frequency <= 1 && { opacity: 0.4 }]}
-                onPress={() => setFrequency((f) => Math.max(1, f - 1))}
-              >
-                <Text style={styles.freqButtonText}>−</Text>
-              </Pressable>
-              <Text style={styles.freqValue}>
-                {frequency}
-                <Text style={styles.freqUnit}>×</Text>
-              </Text>
-              <Pressable
-                style={[styles.freqButton, frequency >= 5 && { opacity: 0.4 }]}
-                onPress={() => setFrequency((f) => Math.min(5, f + 1))}
-              >
-                <Text style={styles.freqButtonText}>+</Text>
-              </Pressable>
-            </View>
-          </View>
+                <View style={styles.frequencyRow}>
+                  <Pressable
+                    style={[
+                      styles.freqButton,
+                      frequency <= 1 && { opacity: 0.4 },
+                    ]}
+                    onPress={() => setFrequency((f) => Math.max(1, f - 1))}
+                  >
+                    <Text style={styles.freqButtonText}>−</Text>
+                  </Pressable>
+                  <Text style={styles.freqValue}>
+                    {frequency}
+                    <Text style={styles.freqUnit}>×</Text>
+                  </Text>
+                  <Pressable
+                    style={[
+                      styles.freqButton,
+                      frequency >= 5 && { opacity: 0.4 },
+                    ]}
+                    onPress={() => setFrequency((f) => Math.min(5, f + 1))}
+                  >
+                    <Text style={styles.freqButtonText}>+</Text>
+                  </Pressable>
+                </View>
+              </View>
+            </>
+          )}
         </ScrollView>
 
         {/* Save button */}

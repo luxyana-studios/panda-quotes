@@ -10,6 +10,7 @@ import Animated, {
   withSpring,
   withTiming,
 } from "react-native-reanimated";
+import { useSettingsStore } from "@/features/settings/stores/settings.store";
 import { onboardingStyles as styles } from "@/styles/onboarding.styles";
 
 interface CategoriesScreenProps {
@@ -91,6 +92,7 @@ function CategoryChip({
 
 export function CategoriesScreen({ onNext, onBack }: CategoriesScreenProps) {
   const { t } = useTranslation();
+  const { setSelectedCategories } = useSettingsStore();
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
   const headerOpacity = useSharedValue(0);
@@ -174,7 +176,13 @@ export function CategoriesScreen({ onNext, onBack }: CategoriesScreenProps) {
       </View>
 
       <View style={styles.bottomButtonContainer}>
-        <Pressable style={styles.nextButton} onPress={onNext}>
+        <Pressable
+          style={styles.nextButton}
+          onPress={() => {
+            setSelectedCategories([...selected]);
+            onNext();
+          }}
+        >
           <Text style={styles.nextButtonText}>
             {t("onboarding.categories.next")}
           </Text>
