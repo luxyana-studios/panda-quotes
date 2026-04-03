@@ -1,15 +1,25 @@
 import { useState } from "react";
 import { useSettingsStore } from "@/features/settings/stores/settings.store";
+import { CategoriesScreen } from "./CategoriesScreen";
+import { LanguageScreen } from "./LanguageScreen";
 import { NameScreen } from "./NameScreen";
 import { NotificationsScreen } from "./NotificationsScreen";
 import { WelcomeBackScreen } from "./WelcomeBackScreen";
 import { WelcomeScreen } from "./WelcomeScreen";
 
-type OnboardingStep = "welcome" | "name" | "notifications" | "welcomeBack";
+type OnboardingStep =
+  | "language"
+  | "welcome"
+  | "name"
+  | "categories"
+  | "notifications"
+  | "welcomeBack";
 
 const STEPS: OnboardingStep[] = [
+  "language",
   "welcome",
   "name",
+  "categories",
   "notifications",
   "welcomeBack",
 ];
@@ -43,10 +53,14 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
   };
 
   switch (currentStep) {
+    case "language":
+      return <LanguageScreen onNext={goNext} />;
     case "welcome":
       return <WelcomeScreen onNext={goNext} />;
     case "name":
       return <NameScreen onNext={goNext} onBack={goBack} />;
+    case "categories":
+      return <CategoriesScreen onNext={goNext} onBack={goBack} />;
     case "notifications":
       return (
         <NotificationsScreen

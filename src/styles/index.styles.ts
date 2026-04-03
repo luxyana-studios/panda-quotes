@@ -1,5 +1,6 @@
 import { StyleSheet } from "react-native";
 import { colors } from "@/constants/colors";
+import { rs } from "@/core/theme/responsive";
 
 export const styles = StyleSheet.create({
   // ─── Container ────────────────────────────────────────────
@@ -8,8 +9,8 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: colors.brandAccent,
-    padding: 24,
-    gap: 20,
+    padding: rs(24),
+    gap: rs(20),
   },
   topDecoration: {
     position: "absolute",
@@ -32,9 +33,9 @@ export const styles = StyleSheet.create({
 
   // ─── Panda Image ──────────────────────────────────────────
   pandaImageWrapper: {
-    width: 140,
-    height: 140,
-    borderRadius: 70,
+    width: rs(140),
+    height: rs(140),
+    borderRadius: rs(70),
     overflow: "hidden",
     borderWidth: 4,
     borderColor: "rgba(255,255,255,0.5)",
@@ -52,28 +53,28 @@ export const styles = StyleSheet.create({
   // ─── Quote Card ───────────────────────────────────────────
   quoteContainer: {
     backgroundColor: colors.brandLight,
-    borderRadius: 24,
-    padding: 28,
-    marginVertical: 8,
+    borderRadius: rs(24),
+    padding: rs(28),
+    marginVertical: rs(8),
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,
     shadowRadius: 12,
     elevation: 5,
-    maxWidth: 360,
+    maxWidth: rs(360),
     width: "100%",
   },
   quoteText: {
-    fontSize: 22,
-    lineHeight: 34,
+    fontSize: rs(22),
+    lineHeight: rs(34),
     color: colors.brandDark,
     textAlign: "center",
     fontStyle: "italic",
-    marginBottom: 16,
+    marginBottom: rs(16),
     letterSpacing: 0.2,
   },
   author: {
-    fontSize: 14,
+    fontSize: rs(14),
     color: colors.brandPrimary,
     textAlign: "right",
     fontWeight: "500",
@@ -81,12 +82,12 @@ export const styles = StyleSheet.create({
 
   // ─── Intention Text ───────────────────────────────────────
   intentionContainer: {
-    paddingHorizontal: 32,
-    gap: 14,
+    paddingHorizontal: rs(32),
+    gap: rs(14),
   },
   intentionText: {
-    fontSize: 21,
-    lineHeight: 32,
+    fontSize: rs(21),
+    lineHeight: rs(32),
     color: "#ffffff",
     textAlign: "center",
     fontWeight: "500",
@@ -95,48 +96,48 @@ export const styles = StyleSheet.create({
 
   // ─── Buttons ──────────────────────────────────────────────
   buttonContainer: {
-    gap: 14,
+    gap: rs(14),
     alignItems: "center",
   },
   primaryButton: {
     backgroundColor: "#ffffff",
-    paddingVertical: 17,
-    paddingHorizontal: 36,
+    paddingVertical: rs(17),
+    paddingHorizontal: rs(36),
     borderRadius: 30,
     shadowColor: "rgba(0,0,0,0.25)",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 1,
     shadowRadius: 10,
     elevation: 4,
-    minWidth: 220,
+    minWidth: rs(220),
     alignItems: "center",
   },
   primaryButtonText: {
     color: colors.brandDark,
-    fontSize: 17,
+    fontSize: rs(17),
     fontWeight: "700",
     letterSpacing: 0.3,
   },
   secondaryButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 24,
+    paddingVertical: rs(12),
+    paddingHorizontal: rs(24),
     borderRadius: 20,
     backgroundColor: "rgba(255,255,255,0.15)",
   },
   secondaryButtonText: {
     color: "rgba(255,255,255,0.9)",
-    fontSize: 15,
+    fontSize: rs(15),
     fontWeight: "500",
     textAlign: "center",
   },
 
   // ─── Completion / Closing ─────────────────────────────────
   completionContainer: {
-    gap: 20,
+    gap: rs(20),
     alignItems: "center",
   },
   closingMessage: {
-    fontSize: 17,
+    fontSize: rs(17),
     color: "rgba(255,255,255,0.85)",
     fontStyle: "italic",
     textAlign: "center",

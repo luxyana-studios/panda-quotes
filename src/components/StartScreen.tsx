@@ -1,6 +1,8 @@
+import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { useVideoPlayer, VideoView } from "expo-video";
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, {
   Easing,
@@ -9,6 +11,7 @@ import Animated, {
   withDelay,
   withTiming,
 } from "react-native-reanimated";
+import { SettingsModal } from "@/components/SettingsModal";
 import { styles } from "@/styles/index.styles";
 
 const pandaVideo = require("@/assets/panda-animate.mp4");
@@ -21,7 +24,9 @@ const EASE_OUT = Easing.bezier(0.25, 0.46, 0.45, 0.94);
 const EASE_SPRING = Easing.bezier(0.34, 1.56, 0.64, 1);
 
 export function StartScreen({ onReady }: StartScreenProps) {
+  const { t } = useTranslation();
   const [showButton, setShowButton] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const isAnimatingRef = useRef(false);
 
   const imageOpacity = useSharedValue(0);
@@ -79,6 +84,7 @@ export function StartScreen({ onReady }: StartScreenProps) {
 
   // ── Screen entrance animation ────────────────────────────────
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Reanimated shared values are stable refs
   useEffect(() => {
     const timer = setTimeout(() => {
       imageOpacity.value = withTiming(1, { duration: 900, easing: EASE_OUT });
@@ -124,6 +130,7 @@ export function StartScreen({ onReady }: StartScreenProps) {
 
   // ── Video end → return and transition ────────────────────────
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Reanimated shared values are stable refs
   useEffect(() => {
     const subscription = player.addListener("playToEnd", () => {
       if (!isAnimatingRef.current) return;
@@ -180,6 +187,22 @@ export function StartScreen({ onReady }: StartScreenProps) {
       <View style={styles.topDecoration} />
       <View style={styles.bottomDecoration} />
 
+      <Pressable
+        style={settingsButtonStyle}
+        onPress={() => setShowSettings(true)}
+      >
+        <Ionicons
+          name="earth-outline"
+          size={22}
+          color="rgba(255,255,255,0.9)"
+        />
+      </Pressable>
+
+      <SettingsModal
+        visible={showSettings}
+        onClose={() => setShowSettings(false)}
+      />
+
       <Animated.View
         style={[styles.pandaImageWrapper, imageStyle, circleWrapperStyle]}
       >
@@ -205,10 +228,10 @@ export function StartScreen({ onReady }: StartScreenProps) {
 
       <View style={styles.intentionContainer}>
         <Animated.Text style={[styles.intentionText, text1Style]}>
-          Take a breath.
+          {t("start.takeBreath")}
         </Animated.Text>
         <Animated.Text style={[styles.intentionText, text2Style]}>
-          Think of a question or situation.
+          {t("start.thinkQuestion")}
         </Animated.Text>
       </View>
 
@@ -216,7 +239,7 @@ export function StartScreen({ onReady }: StartScreenProps) {
         {showButton && (
           <Animated.View style={buttonStyle}>
             <Pressable style={styles.primaryButton} onPress={handleReady}>
-              <Text style={styles.primaryButtonText}>{"I'm ready"}</Text>
+              <Text style={styles.primaryButtonText}>{t("start.ready")}</Text>
             </Pressable>
           </Animated.View>
         )}
@@ -224,3 +247,18 @@ export function StartScreen({ onReady }: StartScreenProps) {
     </View>
   );
 }
+
+const settingsButtonStyle: import("react-native").ViewStyle = {
+  position: "absolute",
+  top: 52,
+  right: 16,
+  width: 42,
+  height: 42,
+  borderRadius: 21,
+  backgroundColor: "rgba(255,255,255,0.25)",
+  justifyContent: "center",
+  alignItems: "center",
+  zIndex: 10,
+  borderWidth: 1.5,
+  borderColor: "rgba(255,255,255,0.35)",
+};

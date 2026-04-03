@@ -1,5 +1,6 @@
 import { Image } from "expo-image";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Pressable, Text, View } from "react-native";
 import Animated, {
   Easing,
@@ -9,28 +10,28 @@ import Animated, {
   withSpring,
   withTiming,
 } from "react-native-reanimated";
+import { useSettingsStore } from "@/features/settings/stores/settings.store";
 import { onboardingStyles as styles } from "@/styles/onboarding.styles";
 
-const CATEGORIES = [
-  "Wisdom",
-  "Patience",
-  "Joy",
-  "Nature",
-  "Humor",
-  "Courage",
-  "Peace",
-  "Growth",
-  "Resilience",
-  "Self-discovery",
-];
-
 interface CategoriesScreenProps {
-  onNext: (categories: string[]) => void;
+  onNext: () => void;
   onBack: () => void;
-  onSkip: () => void;
 }
 
 const EASE_OUT = Easing.bezier(0.25, 0.46, 0.45, 0.94);
+
+const CATEGORY_KEYS = [
+  "wisdom",
+  "patience",
+  "joy",
+  "nature",
+  "humor",
+  "courage",
+  "peace",
+  "growth",
+  "resilience",
+  "selfDiscovery",
+] as const;
 
 function CategoryChip({
   label,
@@ -52,6 +53,7 @@ function CategoryChip({
     opacity: chipOpacity.value,
   }));
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Reanimated shared values are stable refs
   useEffect(() => {
     const timer = setTimeout(() => {
       chipOpacity.value = withDelay(
@@ -88,11 +90,9 @@ function CategoryChip({
   );
 }
 
-export function CategoriesScreen({
-  onNext,
-  onBack,
-  onSkip,
-}: CategoriesScreenProps) {
+export function CategoriesScreen({ onNext, onBack }: CategoriesScreenProps) {
+  const { t } = useTranslation();
+  const { setSelectedCategories } = useSettingsStore();
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
   const headerOpacity = useSharedValue(0);
@@ -100,6 +100,7 @@ export function CategoriesScreen({
     opacity: headerOpacity.value,
   }));
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Reanimated shared values are stable refs
   useEffect(() => {
     const timer = setTimeout(() => {
       headerOpacity.value = withTiming(1, { duration: 600, easing: EASE_OUT });
@@ -107,13 +108,13 @@ export function CategoriesScreen({
     return () => clearTimeout(timer);
   }, []);
 
-  const toggleCategory = (category: string) => {
+  const toggleCategory = (key: string) => {
     setSelected((prev) => {
       const next = new Set(prev);
-      if (next.has(category)) {
-        next.delete(category);
+      if (next.has(key)) {
+        next.delete(key);
       } else {
-        next.add(category);
+        next.add(key);
       }
       return next;
     });
@@ -125,10 +126,10 @@ export function CategoriesScreen({
         <Pressable style={styles.headerBackButton} onPress={onBack}>
           <Text style={styles.headerBackText}>{"\u2039"}</Text>
         </Pressable>
-        <Text style={styles.headerTitle}>Categories</Text>
-        <Pressable style={styles.headerSkipButton} onPress={onSkip}>
-          <Text style={styles.headerSkipText}>Skip</Text>
-        </Pressable>
+        <Text style={styles.headerTitle}>
+          {t("onboarding.categories.header")}
+        </Text>
+        <View style={styles.headerSpacer} />
       </View>
 
       <View style={styles.progressContainer}>
@@ -147,19 +148,21 @@ export function CategoriesScreen({
             />
           </View>
 
-          <Text style={styles.heading}>What brings you joy?</Text>
+          <Text style={styles.heading}>
+            {t("onboarding.categories.heading")}
+          </Text>
           <Text style={styles.subtitle}>
-            {"Choose the themes you'd like to explore"}
+            {t("onboarding.categories.subtitle")}
           </Text>
         </Animated.View>
 
         <View style={styles.chipGrid}>
-          {CATEGORIES.map((cat, i) => (
+          {CATEGORY_KEYS.map((key, i) => (
             <CategoryChip
-              key={cat}
-              label={cat}
-              selected={selected.has(cat)}
-              onPress={() => toggleCategory(cat)}
+              key={key}
+              label={t(`onboarding.categories.${key}`)}
+              selected={selected.has(key)}
+              onPress={() => toggleCategory(key)}
               delay={i * 60}
             />
           ))}
@@ -167,7 +170,7 @@ export function CategoriesScreen({
 
         {selected.size > 0 && (
           <Text style={styles.chipCount}>
-            {selected.size} {selected.size === 1 ? "theme" : "themes"} selected
+            {t("onboarding.categories.selected", { count: selected.size })}
           </Text>
         )}
       </View>
@@ -175,9 +178,14 @@ export function CategoriesScreen({
       <View style={styles.bottomButtonContainer}>
         <Pressable
           style={styles.nextButton}
-          onPress={() => onNext(Array.from(selected))}
+          onPress={() => {
+            setSelectedCategories([...selected]);
+            onNext();
+          }}
         >
-          <Text style={styles.nextButtonText}>Next</Text>
+          <Text style={styles.nextButtonText}>
+            {t("onboarding.categories.next")}
+          </Text>
         </Pressable>
       </View>
     </View>

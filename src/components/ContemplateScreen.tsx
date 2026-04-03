@@ -1,5 +1,6 @@
 import { Image } from "expo-image";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Pressable, Text, View } from "react-native";
 import Animated, {
   Easing,
@@ -21,6 +22,7 @@ export function ContemplateScreen({
   currentQuote,
   onMoveOn,
 }: ContemplateScreenProps) {
+  const { t } = useTranslation();
   const [showMoveOnButton, setShowMoveOnButton] = useState(false);
 
   const imageOpacity = useSharedValue(0);
@@ -57,6 +59,7 @@ export function ContemplateScreen({
     transform: [{ translateY: buttonTranslateY.value }],
   }));
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Reanimated shared values are stable refs
   useEffect(() => {
     const timer = setTimeout(() => {
       imageOpacity.value = withTiming(1, { duration: 800, easing: EASE_OUT });
@@ -114,13 +117,13 @@ export function ContemplateScreen({
       </Animated.View>
 
       <Animated.Text style={[styles.intentionText, closingStyle]}>
-        Carry this thought with you.
+        {t("contemplate.carryThought")}
       </Animated.Text>
 
       <Animated.View style={[styles.quoteContainer, quoteStyle]}>
         <Text style={styles.quoteText}>{currentQuote}</Text>
         <Animated.Text style={[styles.author, authorStyle]}>
-          — Red Panda Philosopher
+          {t("contemplate.attribution")}
         </Animated.Text>
       </Animated.View>
 
@@ -133,7 +136,7 @@ export function ContemplateScreen({
               disabled={!showMoveOnButton}
             >
               <Text style={styles.primaryButtonText}>
-                {"I'm ready to move on now"}
+                {t("contemplate.moveOn")}
               </Text>
             </Pressable>
           </Animated.View>
